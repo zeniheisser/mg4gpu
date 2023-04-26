@@ -86,8 +86,8 @@ const std::string resetCl = "\033[0m";
 
 int usage( char* argv0, int ret = 1 )
 {
-    std::cout << greenCl << "\tUsage:\t " << resetCl << argv0
-        << " [--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"] [--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
+    std::cout << greenCl << "\nUsage:\t " << resetCl << argv0
+        <<"\t[--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"]\n\t\t[--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
         << "\t\t[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
     std::cout << "\n";
     std::cout << "\tThe LHE file path should be with respect to the directory you are running\n";
