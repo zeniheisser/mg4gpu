@@ -9,7 +9,7 @@ struct fbridgeRunner{
     std::vector<int> selHel;
     std::vector<int> selCol;
     CppObjectInFortran *fBridge;
-    const int chanId = 0;
+    const unsigned int chanId = 0;
     const int nMom = 4;
     int nEvt;
     int nPar;
