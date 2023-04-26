@@ -35,7 +35,7 @@ struct fbridgeRunner{
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
         auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
-        fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
+        fbridgesequence_( &fBridge, &grep -rn momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
         return evalScatAmps;
     }
