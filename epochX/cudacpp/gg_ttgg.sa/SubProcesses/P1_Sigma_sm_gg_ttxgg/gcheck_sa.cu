@@ -196,6 +196,8 @@ int main( int argc, char** argv ){
     }
     
 
+    std::cout << "\n\n\n" << currPath.substr( currPath.find_last_of("/", slashPos - 1) + 1, 2 ) << "\n\n\n";
+
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
 
