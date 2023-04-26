@@ -185,13 +185,13 @@ int main( int argc, char** argv ){
         if( currPath.substr( currPath.find_last_of("\\", slashPos - 1) + 1, 2 ) == "P1" ){
             slhaPath = "..\\..\\Cards\\param_card.dat";
         } else{
-            slhaPath = "\\Cards\\param_card.dat";
+            slhaPath = "Cards\\param_card.dat";
         }
     } else {
         if( currPath.substr( currPath.find_last_of("/", slashPos - 1) + 1, 2 ) == "P1" ){
             slhaPath = "../../Cards/param_card.dat";
         } else {
-            slhaPath = "/Cards/param_card.dat";
+            slhaPath = "Cards/param_card.dat";
         }
     }
     
