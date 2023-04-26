@@ -127,8 +127,8 @@ const std::string resetCl = "\033[0m";
 int usage( char* argv0, int ret = 1 )
 {
     std::cout << greenCl << "\nUsage:\t " << resetCl << argv0
-        <<"\t[--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"]\n\t\t\t[--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
-        << "\t\t\t[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
+        <<"\t[--lhefile=\"YOUR/PATH/HERE\"|-lhe=\"YOUR/PATH/HERE\"]\n\t\t\t[--rwgtcard=YOUR/PATH/HERE|-rwgt=\"YOUR/PATH/HERE\"]\n"
+        << "\t\t\t[--output=YOUR/PATH/HERE\"|-out=\"YOUR/PATH/HERE\"]\n";
     std::cout << "\n";
     std::cout << "\tThe LHE file path should be with respect to the directory you are running\n";
     std::cout << "\tthis program from, and similarly the rwgt_card should be as well.\n\n";
@@ -185,13 +185,13 @@ int main( int argc, char** argv ){
         if( currPath.substr( currPath.find_last_of("\\", slashPos - 1) + 1, 2 ) == "P1" ){
             slhaPath = "..\\..\\Cards\\param_card.dat";
         } else{
-            slhaPath = "\\Cards\\param_card.dat";
+            slhaPath = "Cards\\param_card.dat";
         }
     } else {
         if( currPath.substr( currPath.find_last_of("/", slashPos - 1) + 1, 2 ) == "P1" ){
             slhaPath = "../../Cards/param_card.dat";
         } else {
-            slhaPath = "/Cards/param_card.dat";
+            slhaPath = "Cards/param_card.dat";
         }
     }
     
