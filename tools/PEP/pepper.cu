@@ -87,8 +87,8 @@ const std::string resetCl = "\033[0m";
 int usage( char* argv0, int ret = 1 )
 {
     std::cout << greenCl << "\nUsage:\t " << resetCl << argv0
-        <<"\t[--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"]\n\t\t[--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
-        << "\t\t[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
+        <<"\t[--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"]\n\t\t\t[--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
+        << "\t\t\t[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
     std::cout << "\n";
     std::cout << "\tThe LHE file path should be with respect to the directory you are running\n";
     std::cout << "\tthis program from, and similarly the rwgt_card should be as well.\n\n";
@@ -97,10 +97,10 @@ int usage( char* argv0, int ret = 1 )
 #elif defined MGONGPU_FPTYPE_FLOAT
     std::cout << "\tThe program is currently compiled with float precision.\n";
 #else
-    std::cout << "\tThe program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations.\n";
+    std::cout << "\tThe program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations. Numerical \n";
 #endif
-    std::cout << "\tNumerical precision can only be redefined at compile time.\n\tIf you wish to change the precision, please recompile with the option"
-    << redCl << "\"FPTYPE=f\"/\"FPTYPE=d\"" << resetCl << ".\n\n";
+    std::cout << "\tprecision can only be redefined at compile time. If you wish to change the precision,\n\tplease recompile with the option \""
+    << redCl << "FPTYPE=f" << resetCl << "\"/\"" << redCl << "FPTYPE=d" << resetCl << "\".\n\n";
     return ret;
 }
 
