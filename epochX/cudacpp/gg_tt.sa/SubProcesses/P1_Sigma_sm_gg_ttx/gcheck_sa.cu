@@ -32,21 +32,8 @@ struct fbridgeRunner{
         selCol = std::vector<int>( nEvt, 0 );
         nPar = lheFile->events[0]->getPrts().size();
     }
+#if defined MGONGPU_FPTYPE_FLOAT
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
-        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
-        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
-        fbridgesequence_( &fBridge, &grep -rn momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
-        fbridgedelete_( &fBridge );
-        return evalScatAmps;
-    }
-    std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<double>> momenta, std::shared_ptr<std::vector<double>> alphaS ){
-        if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
-            auto nuMom = std::make_shared<std::vector<float>>( nEvt );
-            auto nuAlphaS = std::make_shared<std::vector<float>>( nEvt );
-            std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); });
-            std::transform( alphaS->begin(), alphaS->end(), nuAlphaS->begin(), [](double gs){ return static_cast<float>(gs); });
-            return scatAmp( nuMom, nuAlphaS );
-        }
         auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
@@ -60,19 +47,36 @@ struct fbridgeRunner{
         fbridgedelete_( &fBridge );
         return evalScatAmps;
     }
-    std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<double>& momenta, std::vector<double>& alphaS ){
-        if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
-            auto nuMom = std::vector<float>( nEvt );
-            auto nuAlphaS = std::vector<float>( nEvt );
-            std::transform( momenta.begin(), momenta.end(), nuMom.begin(), [](double mom){ return static_cast<float>(mom); });
-            std::transform( alphaS.begin(), alphaS.end(), nuAlphaS.begin(), [](double gs){ return static_cast<float>(gs); });
-            return scatAmp( nuMom, nuAlphaS );
-        }
+#endif
+    std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<double>> momenta, std::shared_ptr<std::vector<double>> alphaS ){
+#if defined MGONGPU_FPTYPE_FLOAT
+        auto nuMom = std::make_shared<std::vector<float>>( nEvt );
+        auto nuAlphaS = std::make_shared<std::vector<float>>( nEvt );
+        std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); });
+        std::transform( alphaS->begin(), alphaS->end(), nuAlphaS->begin(), [](double gs){ return static_cast<float>(gs); });
+        return scatAmp( nuMom, nuAlphaS );
+#elif defined MGONGPU_FPTYPE_DOUBLE
         auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
-        fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
+        fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
         return evalScatAmps;
+#endif
+    }
+    std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<double>& momenta, std::vector<double>& alphaS ){
+#if defined MGONGPU_FPTYPE_FLOAT
+        auto nuMom = std::vector<float>( nEvt );
+        auto nuAlphaS = std::vector<float>( nEvt );
+        std::transform( momenta.begin(), momenta.end(), nuMom.begin(), [](double mom){ return static_cast<float>(mom); });
+        std::transform( alphaS.begin(), alphaS.end(), nuAlphaS.begin(), [](double gs){ return static_cast<float>(gs); });
+        return scatAmp( nuMom, nuAlphaS );
+#elif defined MGONGPU_FPTYPE_DOUBLE
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
+        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
+        fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps[0], &selHel[0], &selCol[0] );
+        fbridgedelete_( &fBridge );
+        return evalScatAmps;
+#endif
     }
 };
 
@@ -91,11 +95,13 @@ int usage( char* argv0, int ret = 1 )
     std::cout << "\n";
     std::cout << "The LHE file path should be with respect to the directory you are running\n";
     std::cout << "this program from, and similarly the rwgt_card should be as well.\n";
-    if( typeid(FORTRANFPTYPE(0)) == typeid(double(0)) ){
-        std::cout << "The program is currently compiled with double precision.\n";
-    } else if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
-        std::cout << "The program is currently compiled with float precision.\n";
-    } else{ std::cout << "The program is currently compiled with an unrecognised precision -- FPTYPE is neither float nor double.\n"; }
+#if defined MGONGPU_FPTYPE_DOUBLE
+    std::cout << "The program is currently compiled with double precision.\n";
+#elif defined MGONGPU_FPTYPE_FLOAT
+    std::cout << "The program is currently compiled with float precision.\n";
+#else
+    std::cout << "The program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations.\n";
+#endif
     std::cout << "Numerical precision can only be redefined at compile time.\nIf you wish to change the precision, please recompile with the option \"FPTYPE=f\"/\"FPTYPE=d\".";
     return ret;
 }
