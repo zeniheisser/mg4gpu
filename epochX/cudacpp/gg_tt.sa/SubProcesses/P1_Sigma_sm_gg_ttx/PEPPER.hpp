@@ -53,7 +53,7 @@ namespace PEP::PER
             valStr = vals[3];
         }
         std::string_view getLine(){ return realLine; }
-        void selfWrite( PEP::paramBlock& srcBlock ) override{
+        void selfWrite( PEP::paramBlock& srcBlock ){
             if ( isAll() )
             {
                 for( auto param : srcBlock.params )

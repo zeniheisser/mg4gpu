@@ -13,7 +13,7 @@ struct fbridgeRunner{
     const unsigned int nMom = 4;
     unsigned int nEvt;
     unsigned int nPar;
-    fbrideRunner(){}
+    fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
         if( !lheFile.isParsed() ){ lheFile.deepParse(); }
         nEvt = lheFile.events.size();
@@ -33,7 +33,7 @@ struct fbridgeRunner{
         nPar = lheFile->events[0]->getPrts().size();
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
-        std::shared_ptr<std::vector<FORTRANFPTYPE>> evalScatAmps( nEvt );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
@@ -43,18 +43,18 @@ struct fbridgeRunner{
         if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
             std::shared_ptr<std::vector<float>> nuMom( nEvt );
             std::shared_ptr<std::vector<float>> nuAlphaS( nEvt );
-            std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); })
+            std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); });
             std::transform( alphaS->begin(), alphaS->end(), nuAlphaS->begin(), [](double gs){ return static_cast<float>(gs); });
             return scatAmp( nuMom, nuAlphaS );
         }
-        std::shared_ptr<std::vector<FORTRANFPTYPE>> evalScatAmps( nEvt );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
         return evalScatAmps;
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<float>& momenta, std::vector<float>& alphaS ){
-        std::shared_ptr<std::vector<FORTRANFPTYPE>> evalScatAmps( nEvt );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
@@ -64,11 +64,11 @@ struct fbridgeRunner{
         if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
             auto nuMom = std::vector<float>( nEvt );
             auto nuAlphaS = std::vector<float>( nEvt );
-            std::transform( momenta.begin(), momenta.end(), nuMom.begin(), [](double mom){ return static_cast<float>(mom); })
+            std::transform( momenta.begin(), momenta.end(), nuMom.begin(), [](double mom){ return static_cast<float>(mom); });
             std::transform( alphaS.begin(), alphaS.end(), nuAlphaS.begin(), [](double gs){ return static_cast<float>(gs); });
             return scatAmp( nuMom, nuAlphaS );
         }
-        auto evalScatAmps = std::shared_ptr<std::vector<FORTRANFPTYPE>>( nEvt );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
