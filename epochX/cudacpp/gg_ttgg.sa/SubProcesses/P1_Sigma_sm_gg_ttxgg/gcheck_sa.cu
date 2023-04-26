@@ -1,7 +1,21 @@
+#ifdef WINDOWS
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
 #include "PEPPER.hpp"
 #include "fbridge.cc"
 #include <cstdlib>
 #include <typeinfo>
+
+std::string get_current_dir() {
+    char buff[FILENAME_MAX]; //create string buffer to hold path
+    GetCurrentDir( buff, FILENAME_MAX );
+    std::string current_working_dir(buff);
+    return current_working_dir;
+ }
 
 struct fbridgeRunner{
     std::vector<FORTRANFPTYPE> rndHel;
@@ -159,7 +173,7 @@ int main( int argc, char** argv ){
         return usage( argv[0] );
     }
 
-    std::string currPath = argv[0];
+    std::string currPath = get_current_dir();
 
     size_t slashPos = currPath.find_last_of( "/" ); 
     bool onWindows = false;
