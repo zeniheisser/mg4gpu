@@ -182,21 +182,19 @@ int main( int argc, char** argv ){
         throw std::runtime_error( "Failed to determine current working directory -- need to know where program is run from to identify where to pull and push param_card.dat." );
 
     if( onWindows ){
-        if( currPath.substr( currPath.find_last_of("\\", slashPos - 1) + 1, 2 ) == "P1" ){
+        if( currPath.substr( slashPos + 1, 2 ) == "P1" ){
             slhaPath = "..\\..\\Cards\\param_card.dat";
         } else{
             slhaPath = "Cards\\param_card.dat";
         }
     } else {
-        if( currPath.substr( currPath.find_last_of("/", slashPos - 1) + 1, 2 ) == "P1" ){
+        if( currPath.substr( slashPos + 1, 2 ) == "P1" ){
             slhaPath = "../../Cards/param_card.dat";
         } else {
             slhaPath = "Cards/param_card.dat";
         }
     }
     
-
-    std::cout << "\n\n\n" << currPath.substr( currPath.find_last_of("/", slashPos - 1) + 1, 2 ) << "\n\n\n";
 
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
