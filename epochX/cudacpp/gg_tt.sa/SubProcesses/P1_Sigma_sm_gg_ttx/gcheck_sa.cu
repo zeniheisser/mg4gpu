@@ -9,10 +9,10 @@ struct fbridgeRunner{
     std::vector<int> selHel;
     std::vector<int> selCol;
     CppObjectInFortran *fBridge;
-    const unsigned int chanId = 0;
-    const unsigned int nMom = 4;
-    unsigned int nEvt;
-    unsigned int nPar;
+    const int chanId = 0;
+    const int nMom = 4;
+    int nEvt;
+    int nPar;
     fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
         if( !lheFile.isParsed() ){ lheFile.deepParse(); }
