@@ -559,7 +559,7 @@ namespace PEP
         void setId( std::string identity ){ modded = true; idTag = identity; }
     protected:
         std::string idTag;
-        unsigned int id = npos;
+        long unsigned int id = npos;
         void headWriter() override{
             if( tags.size() == 0 ){
                 if( idTag == "" ){ nodeHeader = "<weight>"; return; }
