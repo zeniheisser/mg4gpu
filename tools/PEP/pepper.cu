@@ -80,11 +80,15 @@ struct fbridgeRunner{
     }
 }; 
 
+const std::string redCl = "\033[31m";
+const std::string greenCl = "\033[32m";
+const std::string resetCl = "\033[0m";
+
 int usage( char* argv0, int ret = 1 )
 {
-    std::cout << "\tUsage:\t " << argv0
+    std::cout << greenCl << "\tUsage:\t " << resetCl << argv0
         << " [--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"] [--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
-        << "[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
+        << "\t\t[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
     std::cout << "\n";
     std::cout << "\tThe LHE file path should be with respect to the directory you are running\n";
     std::cout << "\tthis program from, and similarly the rwgt_card should be as well.\n\n";
@@ -95,7 +99,8 @@ int usage( char* argv0, int ret = 1 )
 #else
     std::cout << "\tThe program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations.\n";
 #endif
-    std::cout << "\tNumerical precision can only be redefined at compile time.\nIf you wish to change the precision, please recompile with the option \"FPTYPE=f\"/\"FPTYPE=d\".\n\n";
+    std::cout << "\tNumerical precision can only be redefined at compile time.\n\tIf you wish to change the precision, please recompile with the option"
+    << redCl << "\"FPTYPE=f\"/\"FPTYPE=d\"" << resetCl << ".\n\n";
     return ret;
 }
 
