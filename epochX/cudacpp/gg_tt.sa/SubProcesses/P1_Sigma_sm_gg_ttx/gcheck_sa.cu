@@ -78,34 +78,26 @@ struct fbridgeRunner{
         return evalScatAmps;
 #endif
     }
-};
-
-std::shared_ptr<std::vector<double>> meEval( std::vector<double>& x, std::vector<double>& y){
-    int random = rand() % 10;
-    if( random == 0 ){ random = 11; }
-    auto thisIsIt = std::make_shared<std::vector<double>>( y.size(), random );
-    return thisIsIt;
-}
+}; 
 
 int usage( char* argv0, int ret = 1 )
 {
-    std::cout << "Usage: " << argv0
+    std::cout << "\tUsage:\t " << argv0
         << " [--lhefile=\"/YOUR/PATH/HERE\"|-lhe=\"/YOUR/PATH/HERE\"] [--rwgtcard=/YOUR/PATH/HERE|-rwgt=\"/YOUR/PATH/HERE\"]\n"
         << "[--output=/YOUR/PATH/HERE\"|-out=\"/YOUR/PATH/HERE\"]\n";
     std::cout << "\n";
-    std::cout << "The LHE file path should be with respect to the directory you are running\n";
-    std::cout << "this program from, and similarly the rwgt_card should be as well.\n";
+    std::cout << "\tThe LHE file path should be with respect to the directory you are running\n";
+    std::cout << "\tthis program from, and similarly the rwgt_card should be as well.\n\n";
 #if defined MGONGPU_FPTYPE_DOUBLE
-    std::cout << "The program is currently compiled with double precision.\n";
+    std::cout << "\tThe program is currently compiled with double precision.\n";
 #elif defined MGONGPU_FPTYPE_FLOAT
-    std::cout << "The program is currently compiled with float precision.\n";
+    std::cout << "\tThe program is currently compiled with float precision.\n";
 #else
-    std::cout << "The program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations.\n";
+    std::cout << "\tThe program is currently compiled with an unrecognised precision -- FPTYPE is defined neither as float nor double for GPU evaluations.\n";
 #endif
-    std::cout << "Numerical precision can only be redefined at compile time.\nIf you wish to change the precision, please recompile with the option \"FPTYPE=f\"/\"FPTYPE=d\".";
+    std::cout << "\tNumerical precision can only be redefined at compile time.\nIf you wish to change the precision, please recompile with the option \"FPTYPE=f\"/\"FPTYPE=d\".\n\n";
     return ret;
 }
-
 
 int main( int argc, char** argv ){
     std::string lheFilePath;
