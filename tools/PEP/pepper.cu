@@ -73,7 +73,7 @@ struct fbridgeRunner{
 #elif defined MGONGPU_FPTYPE_DOUBLE
         auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
         fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
-        fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps[0], &selHel[0], &selCol[0] );
+        fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
         return evalScatAmps;
 #endif
