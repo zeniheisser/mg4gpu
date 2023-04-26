@@ -11,70 +11,96 @@ struct fbridgeRunner{
     CppObjectInFortran *fBridge;
     const unsigned int chanId = 0;
     const int nMom = 4;
+    int nWarpRemain;
     int nEvt;
+    int fauxNEvt;
     int nPar;
     fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
         if( !lheFile.isParsed() ){ lheFile.deepParse(); }
         nEvt = lheFile.events.size();
-        rndHel = std::vector<FORTRANFPTYPE>( nEvt, 0. );
-        rndCol = std::vector<FORTRANFPTYPE>( nEvt, 0. );
-        selHel = std::vector<int>( nEvt, 0 );
-        selCol = std::vector<int>( nEvt, 0 );
+        nWarpRemain = (32 - ( nEvt % 32 )) % 32;
+        fauxNEvt = nEvt + nWarpRemain;
+        rndHel = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
+        rndCol = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
+        selHel = std::vector<int>( fauxNEvt, 0 );
+        selCol = std::vector<int>( fauxNEvt, 0 );
         nPar = lheFile.events[0]->getPrts().size();
     }
     fbridgeRunner( std::shared_ptr<PEP::lheNode> lheFile ){
         if(!lheFile->isParsed() ){ lheFile->deepParse(); }
         nEvt = lheFile->events.size();
-        rndHel = std::vector<FORTRANFPTYPE>( nEvt, 0. );
-        rndCol = std::vector<FORTRANFPTYPE>( nEvt, 0. );
-        selHel = std::vector<int>( nEvt, 0 );
-        selCol = std::vector<int>( nEvt, 0 );
+        nWarpRemain = (32 - ( nEvt % 32 )) % 32;
+        fauxNEvt = nEvt + nWarpRemain;
+        rndHel = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
+        rndCol = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
+        selHel = std::vector<int>( fauxNEvt, 0 );
+        selCol = std::vector<int>( fauxNEvt, 0 );
         nPar = lheFile->events[0]->getPrts().size();
     }
 #if defined MGONGPU_FPTYPE_FLOAT
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
-        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
-        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( fauxNEvt );
+        fbridgecreate_( &fBridge, &fauxNEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
+        evalScatAmps->resize( nEvt );
         return evalScatAmps;
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<float>& momenta, std::vector<float>& alphaS ){
         auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
-        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
+        fbridgecreate_( &fBridge, &fauxNEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
+        evalScatAmps->resize( nEvt );
         return evalScatAmps;
     }
 #endif
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<double>> momenta, std::shared_ptr<std::vector<double>> alphaS ){
+        if( alphaS->size() != fauxNEvt ){
+            for( int k = 0; k < nWarpRemain ; ++k ){
+                alphaS->push_back( 0. );
+                for( int k = 0 ; k < 4 * nPar ; ++k ){
+                    momenta->push_back( 0. );
+                }
+            }
+        }
 #if defined MGONGPU_FPTYPE_FLOAT
-        auto nuMom = std::make_shared<std::vector<float>>( nEvt );
-        auto nuAlphaS = std::make_shared<std::vector<float>>( nEvt );
+        auto nuMom = std::make_shared<std::vector<float>>( fauxNEvt );
+        auto nuAlphaS = std::make_shared<std::vector<float>>( fauxNEvt );
         std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); });
         std::transform( alphaS->begin(), alphaS->end(), nuAlphaS->begin(), [](double gs){ return static_cast<float>(gs); });
         return scatAmp( nuMom, nuAlphaS );
 #elif defined MGONGPU_FPTYPE_DOUBLE
-        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
-        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( fauxNEvt );
+        fbridgecreate_( &fBridge, &fauxNEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta->at(0), &alphaS->at(0), &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
+        evalScatAmps->resize( nEvt );
         return evalScatAmps;
 #endif
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<double>& momenta, std::vector<double>& alphaS ){
+        if( alphaS.size() != fauxNEvt ){
+            for( int k = 0; k < nWarpRemain ; ++k ){
+                alphaS.push_back( 0. );
+                for( int k = 0 ; k < 4 * nPar ; ++k ){
+                    momenta.push_back( 0. );
+                }
+            }
+        }
 #if defined MGONGPU_FPTYPE_FLOAT
-        auto nuMom = std::vector<float>( nEvt );
-        auto nuAlphaS = std::vector<float>( nEvt );
+        auto nuMom = std::vector<float>( fauxNEvt );
+        auto nuAlphaS = std::vector<float>( fauxNEvt );
         std::transform( momenta.begin(), momenta.end(), nuMom.begin(), [](double mom){ return static_cast<float>(mom); });
         std::transform( alphaS.begin(), alphaS.end(), nuAlphaS.begin(), [](double gs){ return static_cast<float>(gs); });
         return scatAmp( nuMom, nuAlphaS );
 #elif defined MGONGPU_FPTYPE_DOUBLE
-        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( nEvt );
-        fbridgecreate_( &fBridge, &nEvt, &nPar, &nMom );
+        auto evalScatAmps = std::make_shared<std::vector<FORTRANFPTYPE>>( fauxNEvt );
+        fbridgecreate_( &fBridge, &fauxNEvt, &nPar, &nMom );
         fbridgesequence_( &fBridge, &momenta[0], &alphaS[0], &rndHel[0], &rndCol[0], &chanId, &evalScatAmps->at(0), &selHel[0], &selCol[0] );
         fbridgedelete_( &fBridge );
+        evalScatAmps->resize( nEvt );
         return evalScatAmps;
 #endif
     }

@@ -363,7 +363,8 @@ namespace PEP::PER
             initCards(); 
             if( !meInit )
                 throw std::runtime_error( "No function for evaluating scattering amplitudes has been provided." );
-            initMEs = meEval( *momenta, *gS );
+            auto ins = meEval( *momenta, *gS );
+            initMEs = std::make_shared<std::vector<double>>( ins->begin(), ins->begin() + wgts->size() );
             meSet = true;
         }
         bool setParamCard( std::shared_ptr<PEP::lesHouchesCard> slhaParams ){
