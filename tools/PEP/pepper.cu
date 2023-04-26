@@ -41,8 +41,8 @@ struct fbridgeRunner{
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<double>> momenta, std::shared_ptr<std::vector<double>> alphaS ){
         if( typeid(FORTRANFPTYPE(0)) == typeid(float(0)) ){
-            std::shared_ptr<std::vector<float>> nuMom( nEvt );
-            std::shared_ptr<std::vector<float>> nuAlphaS( nEvt );
+            nuMom = std::shared_ptr<std::vector<float>>( nEvt );
+            nuAlphaS = std::shared_ptr<std::vector<float>>( nEvt );
             std::transform( momenta->begin(), momenta->end(), nuMom->begin(), [](double mom){ return static_cast<float>(mom); });
             std::transform( alphaS->begin(), alphaS->end(), nuAlphaS->begin(), [](double gs){ return static_cast<float>(gs); });
             return scatAmp( nuMom, nuAlphaS );
@@ -108,9 +108,9 @@ int main( int argc, char** argv ){
     std::string slhaPath;
 
     // READ COMMAND LINE ARGUMENTS
-    for( auto arg : argv )
+    for( int argn = 1; argn < argc; ++argn )
     {
-        auto currArg = std::string( arg );
+        std::string arg = argv[argn];
         if( currArg.substr(0,9) == "--lhefile" || currArg.substr(0,4) == "-lhe" )
         {
             lheFilePath = currArg.substr( currArg.find( "=" ) + 1 ); 
@@ -134,7 +134,7 @@ int main( int argc, char** argv ){
 
     size_t slashPos = currPath.find_last_of( "/" ); 
     bool onWindows = false;
-    if( slashPos == std::string::npos ){ slashPos = currpath.find_last_of( "\\" ); onWindows = true; }
+    if( slashPos == std::string::npos ){ slashPos = currPath.find_last_of( "\\" ); onWindows = true; }
     if( slashPos == std::string::npos )
         throw std::runtime_error( "Failed to determine current working directory -- need to know where program is run from to identify where to pull and push param_card.dat." );
 
@@ -158,7 +158,10 @@ int main( int argc, char** argv ){
 
     auto bridgeCont = fbridgeRunner( fileCol.getLhe() );
 
-    std::function<std::shared_ptr<std::vector<FORTRANFPTYPE>>( std::vector<double>&, std::vector<double>& )> scatteringAmplitude = bridgeCont.scatAmp;
+    std::function<std::shared_ptr<std::vector<FORTRANFPTYPE>>(std::vector<double>&, std::vector<double>&)> scatteringAmplitude =
+    [&bridgeCont](std::vector<double>& momenta, std::vector<double>& alphaS) {
+        return bridgeCont.scatAmp(momenta, alphaS);
+    };
     PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
 
 
