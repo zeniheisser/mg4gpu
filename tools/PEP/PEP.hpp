@@ -34,8 +34,10 @@
 // is relevant
 namespace PEP
 {
+    #pragma warning( push )
+    #pragma warning( disable : 4101)
     static const size_t npos = -1;
-
+    #pragma warning( pop ) 
     // ZW: minimal fcn for counting the amount
     // of times a given search term appears in
     // a string
