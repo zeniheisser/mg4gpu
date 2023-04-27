@@ -43,7 +43,7 @@ struct fbridgeRunner{
         selHel = std::vector<int>( fauxNEvt, 0 );
         selCol = std::vector<int>( fauxNEvt, 0 );
         nPar = lheFile.events[0]->getPrts().size();
-        if( !isCorrProc() )
+        if( !isCorrPar() )
             throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
     }
     fbridgeRunner( std::shared_ptr<PEP::lheNode> lheFile ){
@@ -56,8 +56,6 @@ struct fbridgeRunner{
         selHel = std::vector<int>( fauxNEvt, 0 );
         selCol = std::vector<int>( fauxNEvt, 0 );
         nPar = lheFile->events[0]->getPrts().size();
-        if( !isCorrProc() )
-            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
     }
 #if defined MGONGPU_FPTYPE_FLOAT
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
