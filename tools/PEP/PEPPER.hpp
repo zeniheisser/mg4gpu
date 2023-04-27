@@ -53,7 +53,7 @@ namespace PEP::PER
             valStr = vals[3];
         }
         std::string_view getLine(){ return realLine; }
-        void selfWrite( PEP::paramBlock& srcBlock ){
+        void outWrite( PEP::paramBlock& srcBlock ){
             if ( isAll() )
             {
                 for( auto param : srcBlock.params )
@@ -105,11 +105,11 @@ namespace PEP::PER
             written = true;
             return runBlock;
         }
-        void selfWrite( PEP::paramBlock& srcBlock, const std::map<std::string_view, int>& blocks )
+        void outWrite( PEP::paramBlock& srcBlock, const std::map<std::string_view, int>& blocks )
         {
             for( auto parm : rwgtVals )
             {
-                parm.selfWrite( srcBlock );
+                parm.outWrite( srcBlock );
             }
             srcBlock.modded = true;
             return;
@@ -159,7 +159,7 @@ namespace PEP::PER
             procString = rwgtSet.substr( strtLi, endLi - strtLi );
             if( parseOnline ){ parse(); }
         }
-        std::shared_ptr<PEP::lesHouchesCard> selfWrite( const PEP::lesHouchesCard& paramOrig ){
+        std::shared_ptr<PEP::lesHouchesCard> outWrite( const PEP::lesHouchesCard& paramOrig ){
             auto slhaOrig = std::make_shared<PEP::lesHouchesCard>( paramOrig );
             std::map<std::string_view, int> blockIds;
             for( int k = 0 ; k < slhaOrig->blocks.size() ; ++k )
@@ -167,7 +167,7 @@ namespace PEP::PER
                 auto nyama = std::pair<std::string_view, int>( slhaOrig->blocks[k].name, k);
                 blockIds.insert( nyama ); }
             for( auto rwgts : rwgtParams )
-            { rwgts.selfWrite( slhaOrig->blocks[ blockIds.at( rwgts.name ) ], blockIds ); }
+            { rwgts.outWrite( slhaOrig->blocks[ blockIds.at( rwgts.name ) ], blockIds ); }
             slhaOrig->modded = true;
             return slhaOrig;
         }
@@ -248,7 +248,7 @@ namespace PEP::PER
             cardVec.reserve( rwgtRuns.size() );
             for( auto rwgt : rwgtRuns )
             {
-                cardVec.push_back( rwgt.selfWrite( slhaOrig ) );
+                cardVec.push_back( rwgt.outWrite( slhaOrig ) );
             }
             return cardVec;
         }

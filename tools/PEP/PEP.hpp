@@ -1041,13 +1041,14 @@ namespace PEP
         void addWgt( std::shared_ptr<bodyWgt> nuWgt, std::string& id ){ modded = true; nuWgt->setId( id ); rwgt.push_back( nuWgt ); }
         bool newWeight(){ return addedWgt; }
         int getNprt(){ return prts.size(); }
-        bool isModded( bool deep = false ) override {
+        bool isModded() override{ return modded; }
+        bool isModded( bool deep ) override {
+            if( !deep ){ return modded; }
             bool modStat = modded;
-            if( !deep ){ return modStat; }
-            for( auto child : children ){ modStat = (modStat || child->isModded( deep )); }
+            for( auto child : children ){ if(modStat){ return modStat; }; modStat = (modStat || child->isModded( deep )); }
             modStat = (modStat || header.isModded());
-            for( auto prt : prts ){ modStat = (modStat || prt->isModded()); }
-            for( auto wgt : rwgt ){ modStat = (modStat || wgt->isModded()); }
+            for( auto prt : prts ){ if(modStat){ return modStat; }; modStat = (modStat || prt->isModded()); }
+            for( auto wgt : rwgt ){ if(modStat){ return modStat; }; modStat = (modStat || wgt->isModded()); }
             return modStat;
         }
         event(){ return; }
