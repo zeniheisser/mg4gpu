@@ -29,6 +29,9 @@ struct fbridgeRunner{
     int nEvt;
     int fauxNEvt;
     int nPar;
+    bool isCorrProc(){
+        return (nPar == mgOnGpu::npar);
+    }
     fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
         if( !lheFile.isParsed() ){ lheFile.deepParse(); }
@@ -40,6 +43,8 @@ struct fbridgeRunner{
         selHel = std::vector<int>( fauxNEvt, 0 );
         selCol = std::vector<int>( fauxNEvt, 0 );
         nPar = lheFile.events[0]->getPrts().size();
+        if( !isCorrPar() )
+            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
     }
     fbridgeRunner( std::shared_ptr<PEP::lheNode> lheFile ){
         if(!lheFile->isParsed() ){ lheFile->deepParse(); }
