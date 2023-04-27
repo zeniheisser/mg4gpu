@@ -473,7 +473,7 @@ endif
 commonlib : $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so
 
 $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so: ../../src/*.h ../../src/*.cc
-	$(MAKE) -C ../../src $(MAKEDEBUG) -f $(CUDACPP_SRC_MAKEFILE)
+	$(MAKE) -C ../../src -f $(CUDACPP_SRC_MAKEFILE)
 
 #-------------------------------------------------------------------------------
 
