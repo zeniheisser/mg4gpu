@@ -35,6 +35,9 @@ struct fbridgeRunner{
     fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
         if( !lheFile.isParsed() ){ lheFile.deepParse(); }
+        nPar = lheFile.events[0]->getPrts().size();
+        if( !isCorrProc() )
+            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
         nEvt = lheFile.events.size();
         nWarpRemain = (32 - ( nEvt % 32 )) % 32;
         fauxNEvt = nEvt + nWarpRemain;
@@ -42,12 +45,12 @@ struct fbridgeRunner{
         rndCol = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
         selHel = std::vector<int>( fauxNEvt, 0 );
         selCol = std::vector<int>( fauxNEvt, 0 );
-        nPar = lheFile.events[0]->getPrts().size();
-        if( !isCorrProc() )
-            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
     }
     fbridgeRunner( std::shared_ptr<PEP::lheNode> lheFile ){
         if(!lheFile->isParsed() ){ lheFile->deepParse(); }
+        nPar = lheFile->events[0]->getPrts().size();
+        if( !isCorrProc() )
+            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
         nEvt = lheFile->events.size();
         nWarpRemain = (32 - ( nEvt % 32 )) % 32;
         fauxNEvt = nEvt + nWarpRemain;
@@ -55,9 +58,6 @@ struct fbridgeRunner{
         rndCol = std::vector<FORTRANFPTYPE>( fauxNEvt, 0. );
         selHel = std::vector<int>( fauxNEvt, 0 );
         selCol = std::vector<int>( fauxNEvt, 0 );
-        nPar = lheFile->events[0]->getPrts().size();
-        if( !isCorrProc() )
-            throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
     }
 #if defined MGONGPU_FPTYPE_FLOAT
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<float>> momenta, std::shared_ptr<std::vector<float>> alphaS ){
