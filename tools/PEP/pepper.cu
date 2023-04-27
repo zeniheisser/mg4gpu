@@ -72,7 +72,7 @@ struct fbridgeRunner{
 #endif
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::shared_ptr<std::vector<double>> momenta, std::shared_ptr<std::vector<double>> alphaS ){
         if( alphaS->size() != fauxNEvt ){
-            for( int k = 0; k < nWarpRemain ; ++k ){
+            for( int j = 0; j < nWarpRemain ; ++j ){
                 alphaS->push_back( 0. );
                 for( int k = 0 ; k < 4 * nPar ; ++k ){
                     momenta->push_back( 0. );
@@ -96,7 +96,7 @@ struct fbridgeRunner{
     }
     std::shared_ptr<std::vector<FORTRANFPTYPE>> scatAmp( std::vector<double>& momenta, std::vector<double>& alphaS ){
         if( alphaS.size() != fauxNEvt ){
-            for( int k = 0; k < nWarpRemain ; ++k ){
+            for( int j = 0; j < nWarpRemain ; ++j ){
                 alphaS.push_back( 0. );
                 for( int k = 0 ; k < 4 * nPar ; ++k ){
                     momenta.push_back( 0. );

@@ -34,8 +34,10 @@
 // is relevant
 namespace PEP
 {
+    #pragma warning( push )
+    #pragma warning( disable : 4101)
     static const size_t npos = -1;
-
+    #pragma warning( pop ) 
     // ZW: minimal fcn for counting the amount
     // of times a given search term appears in
     // a string
@@ -78,7 +80,7 @@ namespace PEP
         auto lineBreaks = nuFindEach( currEvt, "\n" );
         std::vector<size_t> trueBreaks;
         trueBreaks.reserve( lineBreaks->size() );
-        for( int k = 0 ; k < lineBreaks->size() - 1 ; ++k )
+        for( unsigned int k = 0 ; k < lineBreaks->size() - 1 ; ++k )
         {
             if( int( (*lineBreaks)[k+1] - (*lineBreaks)[k]) == 1){continue;}
             trueBreaks.push_back( (*lineBreaks)[k] );
@@ -91,7 +93,7 @@ namespace PEP
             splitLines->push_back( currEvt.substr( startPos + 1, k - startPos - 1) );
             startPos = k;
         }
-        if( auto strung = currEvt.substr( startPos ).size() > 1 ){ splitLines->push_back( currEvt.substr( startPos ) ); }
+        if( auto strung = currEvt.substr( startPos ).size() > 1 ){ splitLines->push_back( strung ); }
         return splitLines;
     }
 
@@ -104,7 +106,7 @@ namespace PEP
         auto lineBreaks = nuFindEach( currEvt.substr( startPos, endPos - startPos), "\n" );
         auto truBreaks = std::make_shared<std::vector<size_t>>();
         truBreaks->reserve( lineBreaks->size() );
-        for( int k = 0 ; k < lineBreaks->size() ; ++k )
+        for( unsigned int k = 0 ; k < lineBreaks->size() ; ++k )
         {
             if( int( (*lineBreaks)[k+1] - (*lineBreaks)[k]) == 1){continue;}
             truBreaks->push_back( (*lineBreaks)[k] );
@@ -516,9 +518,9 @@ namespace PEP
         std::string_view getTag(){ return idTag; }
         bool hasTag(){ return (idTag.size() > 0); }
         headWeight(){ name = "weight"; return; }
-        headWeight( std::string_view paramSet, const size_t& begin = 0 ) : xmlNode(){ name = "weight"; xmlFile = paramSet; content = paramSet; return; }
+        headWeight( std::string_view paramSet, const size_t& begin = 0 ) : xmlNode(){ name = "weight"; xmlFile = paramSet; start = begin; content = paramSet; return; }
         headWeight( std::string_view paramSet, std::string_view idText, int idNo, const size_t& begin = 0 ) : xmlNode(){
-            name = "weight"; xmlFile = paramSet; content = paramSet; idTag = idText; id = idNo;
+            name = "weight"; xmlFile = paramSet; content = paramSet; start = begin; idTag = idText; id = idNo;
         }
         headWeight( xmlNode& node ) : xmlNode( node ){
             parser( false );
@@ -551,7 +553,7 @@ namespace PEP
             }
         }
         headWeight( std::string_view paramSet, std::string& idText, unsigned int idNo, const size_t& begin = 0 ) : xmlNode(){
-            name = "weight"; xmlFile = paramSet; content = paramSet; idTag = idText; id = idNo;
+            name = "weight"; xmlFile = paramSet; content = paramSet; start = bogin; idTag = idText; id = idNo;
         }
         headWeight( std::string_view paramSet, std::string& idText){
             name = "weight"; xmlFile = paramSet; content = paramSet; idTag = idText;
@@ -935,7 +937,7 @@ namespace PEP
             if( !isModded() ){ content = std::make_shared<std::string>( sourceFile ); return; }
             auto retText = std::make_shared<std::string>( " " );
             *content = " " + std::string( nprt );
-            for( int k = 0 ; k < 8 - procid.length() ; ++k ){ *content += " "; }
+            for( unsigned int k = 0 ; k < 8 - procid.length() ; ++k ){ *content += " "; }
             *content +=  std::string( procid ) + " " + std::string( weight ) + " " + std::string( scale ) + " " + std::string( aqed ) + " " + std::string( aqcd );
             if( comment != "" ){ *content += " # " + std::string( comment ); }
             *content += "\n";
@@ -1012,7 +1014,7 @@ namespace PEP
             if( isWritten() && !isModded() ){ return; }
             if( !isModded() ){ content = std::make_shared<std::string>( sourceFile ); return; }
             *content = "";
-            for( int k = 0; k < 10 - pdg.length() ; ++k ){ *content += " "; }
+            for( unsigned int k = 0; k < 10 - pdg.length() ; ++k ){ *content += " "; }
             *content += std::string(pdg) + " " + std::string(status);
             for( auto mum : mothers ){ *content += "    " + std::string( mum ); }
             for( auto col : icol ){ *content += "  " + std::string( col ); }
@@ -1041,13 +1043,14 @@ namespace PEP
         void addWgt( std::shared_ptr<bodyWgt> nuWgt, std::string& id ){ modded = true; nuWgt->setId( id ); rwgt.push_back( nuWgt ); }
         bool newWeight(){ return addedWgt; }
         int getNprt(){ return prts.size(); }
-        bool isModded( bool deep = false ) override {
+        bool isModded() override{ return modded; }
+        bool isModded( bool deep ) override {
+            if( !deep ){ return modded; }
             bool modStat = modded;
-            if( !deep ){ return modStat; }
-            for( auto child : children ){ modStat = (modStat || child->isModded( deep )); }
+            for( auto child : children ){ if(modStat){ return modStat; }; modStat = (modStat || child->isModded( deep )); }
             modStat = (modStat || header.isModded());
-            for( auto prt : prts ){ modStat = (modStat || prt->isModded()); }
-            for( auto wgt : rwgt ){ modStat = (modStat || wgt->isModded()); }
+            for( auto prt : prts ){ if(modStat){ return modStat; }; modStat = (modStat || prt->isModded()); }
+            for( auto wgt : rwgt ){ if(modStat){ return modStat; }; modStat = (modStat || wgt->isModded()); }
             return modStat;
         }
         event(){ return; }
@@ -1097,9 +1100,9 @@ namespace PEP
         bool eitherRwgt(){ return (hasRwgt() || rwgtChild() ); }
         evHead header;
         std::vector<std::shared_ptr<lhePrt>> prts;
-        bool inRwgtChild( std::string_view name ){ 
+        bool inRwgtChild( std::string_view titleName ){ 
             for( auto child : childRwgt->getChildren() ){ 
-                for( auto tag : child->getTags() ){ if(clStringComp(tag->getVal(), name)){ return true; } }
+                for( auto tag : child->getTags() ){ if(clStringComp(tag->getVal(), titleName)){ return true; } }
             }
             return false;
         }
@@ -1321,7 +1324,7 @@ namespace PEP
             auto writeVal = std::make_shared<std::string>("");
             if( isMod() )
             {
-                for( int k = idStr.size() ; k < 5 ; ++k ){ *writeVal += " "; }
+                for( unsigned int k = idStr.size() ; k < 5 ; ++k ){ *writeVal += " "; }
                 *writeVal += std::string( idStr ) + " " + std::string( valStr );
                 if( comment.size() != 0 ){
                     *writeVal += " # " + std::string( comment );
@@ -1492,7 +1495,7 @@ namespace PEP
             auto blockPts = clFindEach( xmlFile, std::string("\nblock") );
             auto decLines = clFindEach( xmlFile, std::string("\ndecay") );
             header = xmlFile.substr( start, std::min( blockPts->at(0), decLines->at(0) ) - start );
-            for( int k  = 0 ; k < blockPts->size() - 1 ; ++k )
+            for( unsigned int k  = 0 ; k < blockPts->size() - 1 ; ++k )
             {
                 blocks.push_back( paramBlock( xmlFile.substr( blockPts->at(k), blockPts->at(k+1) - blockPts->at(k) ), parseOnline ) );
             }
@@ -1503,8 +1506,8 @@ namespace PEP
             parsed = true;
         } 
         lesHouchesCard( const std::string_view originFile = "", const size_t& begin = 0, bool parseOnline = false ){ 
-            xmlFile = originFile; start = begin; size_t trueStart = originFile.find_first_not_of("\n ", begin+1);
-            modded = false; blockStart = clStringFindIf( xmlFile, std::string("\n"), lambda, start + 1); end = xmlFile.find("</", blockStart);
+            xmlFile = originFile; start = begin; modded = false; 
+            blockStart = clStringFindIf( xmlFile, std::string("\n"), lambda, start + 1); end = xmlFile.find("</", blockStart);
             parsed = false;
             if( parseOnline ){ parse( parseOnline ); }
         }
@@ -1593,7 +1596,7 @@ namespace PEP
             auto linebreaks = lineFinder( content );
             if( linebreaks->size() == 0 ){ return false; }
             initHead = std::make_shared<lheInitHead>(content.substr( 0, linebreaks->at(0) ) );
-            for( int k = 0 ; k < linebreaks->size() - 1 ; ++k ){
+            for( unsigned int k = 0 ; k < linebreaks->size() - 1 ; ++k ){
                 initLines.push_back( std::make_shared<lheInitLine>( content.substr( linebreaks->at(k), linebreaks->at(k+1) - linebreaks->at(k) ) ) );
             }
             return true;
@@ -1690,7 +1693,7 @@ namespace PEP
         void setRelChild(){
             if( relChildSet ){ return; }
             relChild.reserve( children.size() );
-            for( int k = 0 ; k < children.size() ; ++k ){
+            for( unsigned int k = 0 ; k < children.size() ; ++k ){
                 auto child = &children[k];
                 if( (*child)->getName() == "slha" ){ continue; }
                 if( (*child)->getName() == "initrwgt" ){ continue; }
@@ -1822,14 +1825,14 @@ namespace PEP
         void addWgt( size_t index, newWgt& addedWgt ){
             header->addWgt( index, addedWgt.getHeadWgt() );
             auto wgtsVec = addedWgt.getBodyWgts();
-            for( int k = 0 ; k < wgtsVec.size() ; ++k ){
+            for( unsigned int k = 0 ; k < wgtsVec.size() ; ++k ){
                 events[k]->addWgt( wgtsVec[k] );
             }
         }
         void addWgt( size_t index, newWgt& addedWgt, std::string& idTag ){
             header->addWgt( index, addedWgt.getHeadWgt(), idTag );
             auto wgtsVec = addedWgt.getBodyWgts();
-            for( int k = 0 ; k < wgtsVec.size() ; ++k ){
+            for( unsigned int k = 0 ; k < wgtsVec.size() ; ++k ){
                 events[k]->addWgt( wgtsVec[k] );
             }
         }
@@ -1938,11 +1941,9 @@ namespace PEP
         initPos = *nodeStartFind( parseFile, initPos + 1 );
         while( initPos < endPos )
         {
-            auto nuStrtPos =  *nodeStartFind( parseFile, initPos);
             currNode->addChild(xmlPtrParser( parseFile, initPos, endPos ));
             if( currNode->getChildren()[ currNode->getChildren().size() - 1 ]->getName() == "init" ){ continue; }
             if( currNode->getChildren()[ currNode->getChildren().size() - 1 ]->getName() == "slha" ){
-                auto nuLine = parseFile.find("\n", parseFile.find("<", initPos));
                 currNode->setParameters( std::make_shared<slhaNode>(currNode->getChildren()[ currNode->getChildren().size() - 1 ]) );
             }
             if( currNode->getChildren()[ currNode->getChildren().size() - 1 ]->getName() == "initrwgt" ){
@@ -2040,7 +2041,7 @@ namespace PEP
 
     // ZW: fcn for extracting the fill
     // process information from an LHE event
-    std::shared_ptr<std::map<std::string_view, std::vector<std::string_view>>> pgdXtract( event& currEv, const std::vector<std::string>& pdgVec )
+    std::shared_ptr<std::map<std::string_view, std::vector<std::string_view>>> pgdXtract( event& currEv )
     {
         auto currProc = std::make_shared<std::map<std::string_view, std::vector<std::string_view>>>();
         auto &useProc = *currProc;
@@ -2080,7 +2081,6 @@ namespace PEP
     bool procVecContains( std::vector<std::shared_ptr<std::map<std::string_view, std::vector<std::string_view>>>>& sourceProcList, 
     std::map<std::string_view, std::vector<std::string_view>>& newProc, const std::vector<std::string>& pdgVec  )
     {
-        int noProcs = sourceProcList.size();
         for( auto proc : sourceProcList )
         {
             if( sameProcString( *proc, newProc, pdgVec ) ){ return true; }
@@ -2162,7 +2162,7 @@ namespace PEP
             auto currProc = lheProc(*lheFile.events[k]);
             pracBools[ procPos(evtSet, currProc, pdgVec) ][ k ] = true;
         }
-        for( int k = 0 ; k < eventBools.size() ; ++k )
+        for( unsigned int k = 0 ; k < eventBools.size() ; ++k )
         {
             eventBools[k] = std::make_shared<std::vector<bool>>( pracBools[k] );
         }
@@ -2174,7 +2174,7 @@ namespace PEP
     {
         auto reOrdered = std::make_shared<std::vector<std::shared_ptr<event>>>();
         reOrdered->reserve( std::count( relProc.begin(), relProc.end(), true ) );
-        for( int k = 0 ; k < relProc.size() ; ++k )
+        for( unsigned int k = 0 ; k < relProc.size() ; ++k )
         {
             if(!relProc[k]){continue;}
             reOrdered->push_back( lheFile.events[k] );
@@ -2188,7 +2188,7 @@ namespace PEP
         auto procSets = processPull( lheFile ); 
         auto relProcs = procOrder( lheFile, procSets ); 
         std::vector<std::shared_ptr<std::vector<std::shared_ptr<event>>>> ordProcs(procSets.size());
-        for( int k = 0 ; k < relProcs.size() ; ++k )
+        for( unsigned int k = 0 ; k < relProcs.size() ; ++k )
         { 
             ordProcs[k] = eventReOrder( lheFile, *relProcs[k] );
         }
@@ -2277,7 +2277,7 @@ namespace PEP
             xmlFile = lheFile.getFile();
             auto procsOrdered = lheReOrder( lheFile ); 
             subProcs = std::vector<std::shared_ptr<transMonoLHE>>( procsOrdered.size() ); 
-            for( int k = 0 ; k < procsOrdered.size() ; ++k )
+            for( unsigned int k = 0 ; k < procsOrdered.size() ; ++k )
             { 
                 subProcs[k] = std::make_shared<transMonoLHE>( *procsOrdered[k], procsOrdered[k]->at(0)->getNprt() );
             }
@@ -2399,7 +2399,7 @@ namespace PEP
             }
             lheDs[currInd] = vecStoD( xmaxVec );
              ++currInd; } 
-        for( int k = 0 ; k < lheAOS.subProcs.size() ; ++k )
+        for( unsigned int k = 0 ; k < lheAOS.subProcs.size() ; ++k )
         {
             if( boolVec[4] ){ lheDs[currInd] = vecStoD( lheAOS.subProcs[k]->evtsHead.wgts ); ++currInd; }
             if( boolVec[5] ){ lheDs[currInd] = vecStoD( lheAOS.subProcs[k]->evtsHead.scales ); ++currInd; }
@@ -2446,7 +2446,7 @@ namespace PEP
             }
             lheDs[currInd] = vecStoI( lprVec );
              ++currInd; }
-        for( int k = 0 ; k < lheAOS.subProcs.size() ; ++k )
+        for( unsigned int k = 0 ; k < lheAOS.subProcs.size() ; ++k )
         {
             if( boolVec[6] ){ lheDs[currInd] = vecStoI( lheAOS.subProcs[k]->evtsHead.nprts ); ++currInd; }
             if( boolVec[7] ){ lheDs[currInd] = vecStoI( lheAOS.subProcs[k]->evtsHead.procIDs ); ++currInd; }
