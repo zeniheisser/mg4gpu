@@ -199,6 +199,10 @@ int main( int argc, char** argv ){
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
 
+
+    if( fileCol.getLhe()->events[0]->getPrts()->size() != mgOnGpu::nPar )
+        throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
+
     auto bridgeCont = fbridgeRunner( fileCol.getLhe() );
 
     std::function<std::shared_ptr<std::vector<FORTRANFPTYPE>>(std::vector<double>&, std::vector<double>&)> scatteringAmplitude =
