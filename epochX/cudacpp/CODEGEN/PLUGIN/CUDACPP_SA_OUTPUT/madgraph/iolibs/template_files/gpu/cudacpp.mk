@@ -43,6 +43,10 @@ INCFLAGS += -I../../src
 TOOLSDIR = ../../../../../tools
 INCFLAGS += -I$(TOOLSDIR)
 
+# Dependency on test directory
+TESTDIR  = ../../../../../test
+GTESTLIBDIR = $(TESTDIR)/googletest/build/lib/
+GTESTLIBS   = $(GTESTLIBDIR)/libgtest.a $(GTESTLIBDIR)/libgtest_main.a
 
 #-------------------------------------------------------------------------------
 
@@ -392,11 +396,15 @@ fcxx_main=$(BUILDDIR)/fcheck.exe
 
 ifneq ($(NVCC),)
 cu_main=$(BUILDDIR)/gcheck.exe
+fcu_main=$(BUILDDIR)/fgcheck.exe
 else
 cu_main=
+fcu_main=
 endif
 
-all.$(TAG): $(BUILDDIR)/.build.$(TAG) $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cu_main) $(cxx_main) $(fcxx_main)
+testmain=$(BUILDDIR)/runTest.exe
+
+all.$(TAG): $(BUILDDIR)/.build.$(TAG) $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cu_main) $(cxx_main) $(testmain) $(fcu_main) $(fcxx_main)
 
 # Target (and build options): debug
 MAKEDEBUG=
@@ -544,8 +552,100 @@ $(fcxx_main): LIBFLAGS += $(CXXLIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PA
 $(fcxx_main): $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler.o $(LIBDIR)/lib$(MG5AMC_CXXLIB).so $(cxx_objects_exe)
 	$(CXX) -o $@ $(BUILDDIR)/fcheck_sa.o $(OMPFLAGS) $(BUILDDIR)/fsampler.o $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_CXXLIB) $(cxx_objects_exe) $(CULIBFLAGS)
 
+ifneq ($(NVCC),)
+ifneq ($(shell $(CXX) --version | grep ^Intel),)
+$(fcu_main): LIBFLAGS += -lintlc # compile with icpx and link with nvcc (undefined reference to `_intel_fast_memcpy')
+$(fcu_main): LIBFLAGS += -lsvml # compile with icpx and link with nvcc (undefined reference to `__svml_cos4_l9')
+endif
+ifeq ($(UNAME_S),Darwin)
+$(fcu_main): LIBFLAGS += -L$(shell dirname $(shell $(FC) --print-file-name libgfortran.dylib)) # add path to libgfortran on Mac #375
+endif
+$(fcu_main): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(fcu_main): $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler_cu.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects_exe)
+	$(NVCC) -o $@ $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler_cu.o $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
+endif
+
 #-------------------------------------------------------------------------------
-# ZW: removed tests
+
+# Target (and build rules): test objects and test executable
+$(BUILDDIR)/testxxx.o: $(GTESTLIBS)
+$(BUILDDIR)/testxxx.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(BUILDDIR)/testxxx.o: testxxx_cc_ref.txt
+$(testmain): $(BUILDDIR)/testxxx.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/testxxx.o # Comment out this line to skip the C++ test of xxx functions
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/testxxx_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/testxxx_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(BUILDDIR)/testxxx_cu.o: testxxx_cc_ref.txt
+$(testmain): $(BUILDDIR)/testxxx_cu.o
+$(testmain): cu_objects_exe += $(BUILDDIR)/testxxx_cu.o # Comment out this line to skip the CUDA test of xxx functions
+endif
+
+$(BUILDDIR)/testmisc.o: $(GTESTLIBS)
+$(BUILDDIR)/testmisc.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/testmisc.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/testmisc.o # Comment out this line to skip the C++ miscellaneous tests
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/testmisc_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/testmisc_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/testmisc_cu.o
+$(testmain): cu_objects_exe += $(BUILDDIR)/testmisc_cu.o # Comment out this line to skip the CUDA miscellaneous tests
+endif
+
+$(BUILDDIR)/runTest.o: $(GTESTLIBS)
+$(BUILDDIR)/runTest.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/runTest.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/runTest.o
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/runTest_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/runTest_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+ifneq ($(shell $(CXX) --version | grep ^Intel),)
+$(testmain): LIBFLAGS += -lintlc # compile with icpx and link with nvcc (undefined reference to `_intel_fast_memcpy')
+$(testmain): LIBFLAGS += -lsvml # compile with icpx and link with nvcc (undefined reference to `__svml_cos4_l9')
+else ifneq ($(shell $(CXX) --version | grep ^nvc++),) # support nvc++ #531
+$(testmain): LIBFLAGS += -L$(patsubst %%bin/nvc++,%%lib,$(subst ccache ,,$(CXX))) -lnvhpcatm -lnvcpumath -lnvc
+endif
+$(testmain): $(BUILDDIR)/runTest_cu.o
+$(testmain): cu_objects_exe  += $(BUILDDIR)/runTest_cu.o
+endif
+
+$(testmain): $(GTESTLIBS)
+$(testmain): INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): LIBFLAGS += -L$(GTESTLIBDIR) -lgtest -lgtest_main
+
+ifneq ($(OMPFLAGS),)
+ifneq ($(shell $(CXX) --version | egrep '^Intel'),)
+$(testmain): LIBFLAGS += -liomp5 # see #578 (not '-qopenmp -static-intel' as in https://stackoverflow.com/questions/45909648)
+else ifneq ($(shell $(CXX) --version | egrep '^clang'),)
+$(testmain): LIBFLAGS += -L $(shell dirname $(shell $(CXX) -print-file-name=libc++.so)) -lomp # see #604
+###else ifneq ($(shell $(CXX) --version | egrep '^Apple clang'),)
+###$(testmain): LIBFLAGS += ???? # OMP is not supported yet by cudacpp for Apple clang (see #578 and #604)
+else
+$(testmain): LIBFLAGS += -lgomp
+endif
+endif
+
+ifeq ($(NVCC),) # link only runTest.o
+$(testmain): LIBFLAGS += $(CXXLIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(testmain): $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cxx_objects_lib) $(cxx_objects_exe) $(GTESTLIBS)
+	$(CXX) -o $@ $(cxx_objects_lib) $(cxx_objects_exe) -ldl -pthread $(LIBFLAGS) $(CULIBFLAGS)
+else # link both runTest.o and runTest_cu.o
+$(testmain): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(testmain): $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cxx_objects_lib) $(cxx_objects_exe) $(cu_objects_lib) $(cu_objects_exe) $(GTESTLIBS)
+	$(NVCC) -o $@ $(cxx_objects_lib) $(cxx_objects_exe) $(cu_objects_lib) $(cu_objects_exe) -ldl $(LIBFLAGS) -lcuda $(CULIBFLAGS)
+endif
+
+# Use flock (Linux only, no Mac) to allow 'make -j' if googletest has not yet been downloaded https://stackoverflow.com/a/32666215
+$(GTESTLIBS):
+ifneq ($(shell which flock 2>/dev/null),)
+	flock $(BUILDDIR)/.make_test.lock $(MAKE) -C $(TESTDIR)
+else
+	$(MAKE) -C $(TESTDIR)
+endif
+
 #-------------------------------------------------------------------------------
 
 # Target: build all targets in all AVX modes (each AVX mode in a separate build directory)
@@ -604,6 +704,9 @@ cleanall:
 	$(MAKE) USEBUILDDIR=0 -C ../../src cleanall -f $(CUDACPP_SRC_MAKEFILE)
 	rm -rf build.*
 
+# Target: clean the builds as well as the googletest installation
+distclean: cleanall
+	$(MAKE) -C $(TESTDIR) clean
 
 #-------------------------------------------------------------------------------
 
@@ -648,5 +751,53 @@ endif
 	@echo ""
 	@echo FC=$(FC)
 	$(FC) --version
+
+#-------------------------------------------------------------------------------
+
+# Target: check (run the C++ test executable)
+# [NB THIS IS WHAT IS USED IN THE GITHUB CI!]
+ifneq ($(NVCC),)
+check: runTest cmpFcheck cmpFGcheck
+else
+check: runTest cmpFcheck
+endif
+
+# Target: runTest (run the C++ test executable runTest.exe)
+runTest: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/runTest.exe
+
+# Target: runCheck (run the C++ standalone executable check.exe, with a small number of events)
+runCheck: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/check.exe -p 2 32 2
+
+# Target: runGcheck (run the CUDA standalone executable gcheck.exe, with a small number of events)
+runGcheck: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/gcheck.exe -p 2 32 2
+
+# Target: runFcheck (run the Fortran standalone executable - with C++ MEs - fcheck.exe, with a small number of events)
+runFcheck: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/fcheck.exe 2 32 2
+
+# Target: runFGcheck (run the Fortran standalone executable - with CUDA MEs - fgcheck.exe, with a small number of events)
+runFGcheck: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/fgcheck.exe 2 32 2
+
+# Target: cmpFcheck (compare ME results from the C++ and Fortran with C++ MEs standalone executables, with a small number of events)
+cmpFcheck: all.$(TAG)
+	@echo
+	@echo "$(BUILDDIR)/check.exe --common -p 2 32 2"
+	@echo "$(BUILDDIR)/fcheck.exe 2 32 2"
+	@me1=$(shell $(RUNTIME) $(BUILDDIR)/check.exe --common -p 2 32 2 | grep MeanMatrix | awk '{print $$4}'); me2=$(shell $(RUNTIME) $(BUILDDIR)/fcheck.exe 2 32 2 | grep Average | awk '{print $$4}'); echo "Avg ME (C++/C++)    = $${me1}"; echo "Avg ME (F77/C++)    = $${me2}"; if [ "$${me2}" == "NaN" ]; then echo "ERROR! Fortran calculation (F77/C++) returned NaN"; elif [ "$${me2}" == "" ]; then echo "ERROR! Fortran calculation (F77/C++) crashed"; else python3 -c "me1=$${me1}; me2=$${me2}; reldif=abs((me2-me1)/me1); print('Relative difference =', reldif); ok = reldif <= 2E-4; print ( '%%s (relative difference %%s 2E-4)' %% ( ('OK','<=') if ok else ('ERROR','>') ) ); import sys; sys.exit(0 if ok else 1)"; fi
+
+# Target: cmpFGcheck (compare ME results from the CUDA and Fortran with CUDA MEs standalone executables, with a small number of events)
+cmpFGcheck: all.$(TAG)
+	@echo
+	@echo "$(BUILDDIR)/gcheck.exe --common -p 2 32 2"
+	@echo "$(BUILDDIR)/fgcheck.exe 2 32 2"
+	@me1=$(shell $(RUNTIME) $(BUILDDIR)/gcheck.exe --common -p 2 32 2 | grep MeanMatrix | awk '{print $$4}'); me2=$(shell $(RUNTIME) $(BUILDDIR)/fgcheck.exe 2 32 2 | grep Average | awk '{print $$4}'); echo "Avg ME (C++/CUDA)   = $${me1}"; echo "Avg ME (F77/CUDA)   = $${me2}"; if [ "$${me2}" == "NaN" ]; then echo "ERROR! Fortran calculation (F77/CUDA) crashed"; elif [ "$${me2}" == "" ]; then echo "ERROR! Fortran calculation (F77/CUDA) crashed"; else python3 -c "me1=$${me1}; me2=$${me2}; reldif=abs((me2-me1)/me1); print('Relative difference =', reldif); ok = reldif <= 2E-4; print ( '%%s (relative difference %%s 2E-4)' %% ( ('OK','<=') if ok else ('ERROR','>') ) ); import sys; sys.exit(0 if ok else 1)"; fi
+
+# Target: memcheck (run the CUDA standalone executable gcheck.exe with a small number of events through cuda-memcheck)
+memcheck: all.$(TAG)
+	$(RUNTIME) $(CUDA_HOME)/bin/cuda-memcheck --check-api-memory-access yes --check-deprecated-instr yes --check-device-heap yes --demangle full --language c --leak-check full --racecheck-report all --report-api-errors all --show-backtrace yes --tool memcheck --track-unused-memory yes $(BUILDDIR)/gcheck.exe -p 2 32 2
 
 #-------------------------------------------------------------------------------

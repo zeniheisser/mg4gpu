@@ -86,7 +86,7 @@ class PLUGIN_ProcessExporter(PLUGIN_export_cpp.ProcessExporterGPU):
                      'CMake': [s+'CMake/Compilers.txt', s+'CMake/Platforms.txt', s+'CMake/Macros.txt'],
                      'src': [s+'gpu/rambo.h', s+'read_slha.h', s+'read_slha.cc',
                              s+'gpu/mgOnGpuFptypes.h', s+'gpu/mgOnGpuCxtypes.h', s+'gpu/mgOnGpuVectors.h',
-                             s+'CMake/src/CMakeLists.txt'],
+                             s+'gpu/CommonRandomNumbers.h', s+'CMake/src/CMakeLists.txt'],
                      'SubProcesses': [s+'gpu/nvtx.h', s+'gpu/timer.h', s+'gpu/timermap.h',
                                       s+'gpu/ompnumthreads.h', s+'gpu/CudaRuntime.h',
                                       s+'gpu/MemoryAccessHelpers.h', s+'gpu/MemoryAccessVectors.h',
@@ -105,7 +105,7 @@ class PLUGIN_ProcessExporter(PLUGIN_export_cpp.ProcessExporterGPU):
                                       s+'gpu/MadgraphTest.h', s+'gpu/runTest.cc',
                                       s+'gpu/testmisc.cc', s+'gpu/testxxx_cc_ref.txt',
                                       s+'gpu/perf.py', s+'gpu/profile.sh',
-                                      s+'CMake/SubProcesses/CMakeLists.txt']}
+                                      s+'CMake/SubProcesses/CMakeLists.txt', s+'PEP.hpp', s+'PEPPER.hpp',]}
     to_link_in_P = ['nvtx.h', 'timer.h', 'timermap.h',
                     'ompnumthreads.h', 'CudaRuntime.h',
                     'MemoryAccessHelpers.h', 'MemoryAccessVectors.h',
@@ -127,7 +127,8 @@ class PLUGIN_ProcessExporter(PLUGIN_export_cpp.ProcessExporterGPU):
                     'testxxx.cc', # this is generated from a template in Subprocesses but we still link it in Sigma
                     'MemoryBuffers.h', # this is generated from a template in Subprocesses but we still link it in Sigma
                     'MemoryAccessCouplings.h', # this is generated from a template in Subprocesses but we still link it in Sigma
-                    'perf.py', 'profile.sh']
+                    'perf.py', 'profile.sh',
+                    'PEP.hpp', 'PEPPER.hpp']
 
     # AV - use template files from PLUGINDIR instead of MG5DIR and change their names
     ###template_src_make = pjoin(MG5DIR, 'madgraph' ,'iolibs', 'template_files','gpu','Makefile_src')
