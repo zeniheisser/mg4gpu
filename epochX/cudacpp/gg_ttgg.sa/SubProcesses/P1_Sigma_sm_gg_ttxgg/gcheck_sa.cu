@@ -205,6 +205,9 @@ int main( int argc, char** argv ){
 
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
+    if( rwgtFiles.lheFile->events[0]->getPrts().size() != mgOnGpu::npar ){
+        throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
+    }
 
     auto bridgeCont = fbridgeRunner( fileCol.getLhe() );
 
