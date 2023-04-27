@@ -243,12 +243,12 @@ namespace mg5amcCpu
         throw std::logic_error( "Bridge constructor: FIXME! cannot choose gputhreads" ); // this should never happen!
       m_gpublocks = m_nevt / m_gputhreads;
     }
-    std::cout << "WARNING! Instantiate device Bridge (nevt=" << m_nevt << ", gpublocks=" << m_gpublocks << ", gputhreads=" << m_gputhreads
-              << ", gpublocks*gputhreads=" << m_gpublocks * m_gputhreads << ")" << std::endl;
+    //std::cout << "WARNING! Instantiate device Bridge (nevt=" << m_nevt << ", gpublocks=" << m_gpublocks << ", gputhreads=" << m_gputhreads
+    //          << ", gpublocks*gputhreads=" << m_gpublocks * m_gputhreads << ")" << std::endl;
     mg5amcGpu::CPPProcess process( /*verbose=*/false );
     m_pmek.reset( new mg5amcGpu::MatrixElementKernelDevice( m_devMomentaC, m_devGs, m_devRndHel, m_devRndCol, m_devMEs, m_devSelHel, m_devSelCol, m_gpublocks, m_gputhreads ) );
 #else
-    std::cout << "WARNING! Instantiate host Bridge (nevt=" << m_nevt << ")" << std::endl;
+    //std::cout << "WARNING! Instantiate host Bridge (nevt=" << m_nevt << ")" << std::endl;
     mg5amcCpu::CPPProcess process( /*verbose=*/false );
     m_pmek.reset( new mg5amcCpu::MatrixElementKernelHost( m_hstMomentaC, m_hstGs, m_hstRndHel, m_hstRndCol, m_hstMEs, m_hstSelHel, m_hstSelCol, m_nevt ) );
 #endif // __CUDACC__
@@ -263,8 +263,8 @@ namespace mg5amcCpu
       throw std::runtime_error( "Bridge: gpublocks*gputhreads must equal m_nevt in set_gpugrid" );
     m_gpublocks = gpublocks;
     m_gputhreads = gputhreads;
-    std::cout << "WARNING! Set grid in Bridge (nevt=" << m_nevt << ", gpublocks=" << m_gpublocks << ", gputhreads=" << m_gputhreads
-              << ", gpublocks*gputhreads=" << m_gpublocks * m_gputhreads << ")" << std::endl;
+    //std::cout << "WARNING! Set grid in Bridge (nevt=" << m_nevt << ", gpublocks=" << m_gpublocks << ", gputhreads=" << m_gputhreads
+    //          << ", gpublocks*gputhreads=" << m_gpublocks * m_gputhreads << ")" << std::endl;
     m_pmek->setGrid( m_gpublocks, m_gputhreads );
   }
 #endif
