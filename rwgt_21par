@@ -58,46 +58,6 @@ launch
    set sminputs 1 4.000000e+04
 launch
    set sminputs 1 8.000000e+04
-  launch
-   set sminputs 1 1.000000e+00
-launch
-   set sminputs 1 2.000000e+00
-launch
-   set sminputs 1 4.000000e+00
-launch
-   set sminputs 1 8.000000e+00
-launch
-   set sminputs 1 1.000000e+01
-launch
-   set sminputs 1 2.000000e+01
-launch
-   set sminputs 1 4.000000e+01
-launch
-   set sminputs 1 8.000000e+01
-launch
-   set sminputs 1 1.000000e+02
-launch
-   set sminputs 1 2.000000e+02
-launch
-   set sminputs 1 4.000000e+02
-launch
-   set sminputs 1 8.000000e+02
-launch
-   set sminputs 1 1.000000e+03
-launch
-   set sminputs 1 2.000000e+03
-launch
-   set sminputs 1 4.000000e+03
-launch
-   set sminputs 1 8.000000e+03
-launch
-   set sminputs 1 1.000000e+04
-launch
-   set sminputs 1 2.000000e+04
-launch
-   set sminputs 1 4.000000e+04
-launch
-   set sminputs 1 8.000000e+04
 launch
    set sminputs 1 0.000000e+00
 launch
