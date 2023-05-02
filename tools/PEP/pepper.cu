@@ -32,7 +32,7 @@ struct fbridgeRunner{
     int nPar;
     fbridgeRunner(){}
     fbridgeRunner( PEP::lheNode& lheFile ){
-        if( !lheFile.isParsed() ){ lheFile.deepParse(); }
+        //if( !lheFile.isParsed() ){ lheFile.deepParse(); }
         nEvt = lheFile.events.size();
         nWarpRemain = (32 - ( nEvt % 32 )) % 32;
         fauxNEvt = nEvt + nWarpRemain;
@@ -43,7 +43,7 @@ struct fbridgeRunner{
         nPar = lheFile.events[0]->getPrts().size();
     }
     fbridgeRunner( std::shared_ptr<PEP::lheNode> lheFile ){
-        if(!lheFile->isParsed() ){ lheFile->deepParse(); }
+        //if(!lheFile->isParsed() ){ lheFile->deepParse(); }
         nEvt = lheFile->events.size();
         nWarpRemain = (32 - ( nEvt % 32 )) % 32;
         fauxNEvt = nEvt + nWarpRemain;

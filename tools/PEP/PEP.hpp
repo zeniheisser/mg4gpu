@@ -1971,13 +1971,25 @@ namespace PEP
         while( initPos < endPos )
         {
             auto nuStrtPos =  *nodeStartFind( parseFile, initPos);
-            if( nuStrtPos == parseFile.find("<event", initPos) ){
+            //if( nuStrtPos == parseFile.find("<event", initPos) ){
+            //    currNode->events.push_back( evPtrParsor( parseFile, initPos, endPos ) );
+            //    continue;
+            //} else if( nuStrtPos == parseFile.find("<header", initPos) ){
+            //    currNode->header = lheHeadParser( parseFile, initPos, endPos );
+            //    continue;
+            //} else if( nuStrtPos == parseFile.find("<init", initPos) ){
+            //    currNode->init = std::make_shared<initNode>( parseFile, initPos );
+            //    initPos = *nodeStartFind( parseFile, endPos );
+            //    endPos = *nodeEndFind( parseFile, *nodeEndFind( parseFile, endPos + 1 ) + 1);
+            //    continue;
+            //}
+            if( parseFile.substr( initPos, 6 ) == "<event" ){
                 currNode->events.push_back( evPtrParsor( parseFile, initPos, endPos ) );
                 continue;
-            } else if( nuStrtPos == parseFile.find("<header", initPos) ){
+            } else if( parseFile.substr( initPos, 7 ) == "<header"  ){
                 currNode->header = lheHeadParser( parseFile, initPos, endPos );
                 continue;
-            } else if( nuStrtPos == parseFile.find("<init", initPos) ){
+            } else if( parseFile.substr( initPos, 5 ) == "<init"  ){
                 currNode->init = std::make_shared<initNode>( parseFile, initPos );
                 initPos = *nodeStartFind( parseFile, endPos );
                 endPos = *nodeEndFind( parseFile, *nodeEndFind( parseFile, endPos + 1 ) + 1);
