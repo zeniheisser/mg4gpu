@@ -223,7 +223,7 @@ int main( int argc, char** argv ){
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     double seconds = duration.count() / 1000000.0;
 
-    std::cout << "\nTime taken: " << duration << "\n"
+    std::cout << "\nTime taken: " << seconds << "\n"
  
     return 0;
 

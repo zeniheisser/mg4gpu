@@ -1057,7 +1057,7 @@ namespace PEP
         event( const std::string_view originFile, const size_t& begin = 0, const std::vector<std::shared_ptr<xmlNode>>& childs = {} ) 
         : xmlNode(originFile, begin, childs) {
             xmlFile = originFile; start = begin; children = childs; size_t trueStart = originFile.find_first_not_of(" ", begin+1);
-            if( trueStart != npos ){name = originFile.substr( trueStart, originFile.find_first_of(">/ ", trueStart) - trueStart );}
+            if( trueStart == npos ){ return; }
             auto vals = lineFinder( originFile.substr( trueStart, originFile.find("<", trueStart +  3 ) - trueStart + 3 ));
             header = evHead(originFile, vals->at(0) + trueStart, vals->at(1) + trueStart + 1 );
             prts.reserve(vals->size());
@@ -1923,11 +1923,11 @@ namespace PEP
         {
             currNode->addChild(xmlPtrParser( parseFile, initPos, endPos ));
         }
-        size_t equalSign = parseFile.find("=", initPos);
-        size_t nodeInitEnd = parseFile.find(">", initPos);
-        while( equalSign < nodeInitEnd ){
-            currNode->addTag( xmlTagParser(parseFile, equalSign) );
-        }
+        //size_t equalSign = parseFile.find("=", initPos);
+        //size_t nodeInitEnd = parseFile.find(">", initPos);
+        //while( equalSign < nodeInitEnd ){
+            //currNode->addTag( xmlTagParser(parseFile, equalSign) );
+        //}
         initPos = *nodeStartFind( parseFile, endPos );
         endPos = *nodeEndFind( parseFile, endPos + 1 );
         return currNode;
