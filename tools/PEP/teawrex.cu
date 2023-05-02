@@ -158,7 +158,7 @@ int main( int argc, char** argv ){
         std::string currArg = argv[argn];
         if( currArg.substr(0,9) == "--lhefile" || currArg.substr(0,4) == "-lhe" )
         {
-            lheFilePath = currArg.substr( currArg.find( "=" ) + 1 ); 
+            //lheFilePath = currArg.substr( currArg.find( "=" ) + 1 ); 
         }
         else if( currArg.substr(0,10) == "--rwgtcard" || currArg.substr(0,5) == "-rwgt" )
         {
@@ -171,7 +171,7 @@ int main( int argc, char** argv ){
         }
     }
 
-    if( lheFilePath.empty() || rwgtCardPath.empty() ){
+    if( rwgtCardPath.empty() ){
         return usage( argv[0] );
     }
 
@@ -197,7 +197,15 @@ int main( int argc, char** argv ){
         }
     }
     
+    std::vector<std:string> subDirs = [ "1", "4", "8", "10", "40", "80", "100", "400", "800", "1k", "4k", "8k", "10k", "40k", "80k", "100k", "400k", "800k", "1M" ];
 
+    std::vector<double> timeVec;
+    timeVec.reserve( subDirs.size() );
+
+    for( auto dir : subDirs ){
+    
+    lheFilePath = "events/" + dir + "/unweighted_events.lhe";
+        
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
 
@@ -213,9 +221,23 @@ int main( int argc, char** argv ){
         return bridgeCont.scatAmp(momenta, alphaS);
     };
 
-    PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
+    auto t0 = std::chrono::high_resolution_clock::now();
 
+    PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
     nuRun.runRwgt( outputPath ); 
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
+    double seconds = duration.count() / 1000000.0;
+    timeVec.push_back( seconds );
+    
+    }
+
+    std::cout << "\n = [ ";
+    for ( int k = 0 ; k < timeVec.size() - 1 ; k++ ){
+        std::cout << timeVec[k] << ", ";
+    }
+    std:cout << timeVec[timeVec.size() - 1] << " ]\n\n";
 
  
     return 0;
