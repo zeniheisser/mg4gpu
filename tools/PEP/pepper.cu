@@ -9,6 +9,7 @@
 #include "fbridge.cc"
 #include <cstdlib>
 #include <typeinfo>
+#include <ctime>
 
 std::string get_current_dir() {
     char buff[FILENAME_MAX]; //create string buffer to hold path
@@ -202,8 +203,6 @@ int main( int argc, char** argv ){
 
     if( fileCol.getLhe()->events[0]->getPrts().size() != mgOnGpu::npar ){
         throw std::runtime_error("Number of external particles in input LHE file differs from nimber of external particles for this process -- process mismatch.");
-    } else{
-        std::cout << "\n\n\nnPrts is " << fileCol.getLhe()->events[0]->getPrts().size() << " and npar is " << mgOnGpu::npar << "\n\n\n\n";
     }
     
     auto bridgeCont = fbridgeRunner( fileCol.getLhe() );
@@ -212,10 +211,14 @@ int main( int argc, char** argv ){
     [&bridgeCont](std::vector<double>& momenta, std::vector<double>& alphaS) {
         return bridgeCont.scatAmp(momenta, alphaS);
     };
+
     PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
 
-
+    std::clock_t c_start = std::clock();
     nuRun.runRwgt( outputPath ); 
+    std::clock_t c_end = std::clock();
+
+    std::cout << "\nTime taken: " << (c_end - c_start) / CLOCKS_PER_SEC << "\n"
  
     return 0;
 
