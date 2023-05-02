@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <typeinfo>
 #include <ctime>
+#include <chrono>
 
 std::string get_current_dir() {
     char buff[FILENAME_MAX]; //create string buffer to hold path
@@ -214,11 +215,15 @@ int main( int argc, char** argv ){
 
     PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
 
-    std::clock_t c_start = std::clock();
-    nuRun.runRwgt( outputPath ); 
-    std::clock_t c_end = std::clock();
 
-    std::cout << "\nTime taken: " << (c_end - c_start) / CLOCKS_PER_SEC << "\n"
+    std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+    nuRun.runRwgt( outputPath ); 
+    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    double seconds = duration.count() / 1000000.0;
+
+    std::cout << "\nTime taken: " << duration << "\n"
  
     return 0;
 
