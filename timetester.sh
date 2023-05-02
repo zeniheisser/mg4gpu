@@ -18,13 +18,17 @@ out_flag=$3
 out_value=$(echo "$out_flag" | cut -d'=' -f2)
 output_file="runtime_${out_value}.txt"
 
+# Extract the value for the -rwgt flag
+rwgt_value=$(echo "$rwgt_flag" | cut -d'=' -f2)
+
 # Remove the output file if it already exists
 if [ -e "$output_file" ]; then
     rm "$output_file"
 fi
 
-# Initialize an empty array to store runtimes
-runtimes=()
+# Initialize two empty arrays to store user and system times
+user_times=()
+sys_times=()
 
 # Run the program 5 times and record the CPU time in seconds
 for i in $(seq 1 $num_runs); do
@@ -35,14 +39,14 @@ for i in $(seq 1 $num_runs); do
     USER_TIME=$(echo "$TIME_OUTPUT" | grep 'user' | awk '{print $2}')
     SYSTEM_TIME=$(echo "$TIME_OUTPUT" | grep 'sys' | awk '{print $2}')
     
-    # Calculate the sum of user and system times
-    TOTAL_CPU_TIME=$(echo "$USER_TIME + $SYSTEM_TIME" | bc)
-
-    # Add the runtime to the array
-    runtimes+=("$TOTAL_CPU_TIME")
+    # Add the times to the respective arrays
+    user_times+=("$USER_TIME")
+    sys_times+=("$SYSTEM_TIME")
 done
 
-# Save the runtimes array to the output file
-echo "runtimes = [ ${runtimes[*]} ]" > "$output_file"
+# Save the user_times and sys_times arrays to the output file
+echo "${rwgt_value}_user_times = [ ${user_times[*]} ]" > "$output_file"
+echo "${rwgt_value}_sys_times = [ ${sys_times[*]} ]" >> "$output_file"
 
 echo "Runtime results have been saved to $output_file"
+
