@@ -197,7 +197,7 @@ int main( int argc, char** argv ){
         }
     }
     
-    std::vector<std:string> subDirs = [ "1", "4", "8", "10", "40", "80", "100", "400", "800", "1k", "4k", "8k", "10k", "40k", "80k", "100k", "400k", "800k", "1M" ];
+    std::vector<std::string> subDirs = [ "1", "4", "8", "10", "40", "80", "100", "400", "800", "1k", "4k", "8k", "10k", "40k", "80k", "100k", "400k", "800k", "1M" ];
 
     std::vector<double> timeVec;
     timeVec.reserve( subDirs.size() );
@@ -237,7 +237,7 @@ int main( int argc, char** argv ){
     for ( int k = 0 ; k < timeVec.size() - 1 ; k++ ){
         std::cout << timeVec[k] << ", ";
     }
-    std:cout << timeVec[timeVec.size() - 1] << " ]\n\n";
+    std::cout << timeVec[timeVec.size() - 1] << " ]\n\n";
 
  
     return 0;
