@@ -426,7 +426,7 @@ namespace PEP::PER
                 singleRwgtIter( paramSets[k], lheFile, k, rwgtSets->rwgtNames[k] );
                 std::cout << ".";
             }
-            lheFileWriter( lheFile, output );
+            //lheFileWriter( lheFile, output );
             PEP::filePusher( slhaPath, *slhaCard );
             std::cout << "\nReweighting done.\n";
         }
