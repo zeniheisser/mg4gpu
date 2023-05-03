@@ -158,11 +158,11 @@ int main( int argc, char** argv ){
         std::string currArg = argv[argn];
         if( currArg.substr(0,9) == "--lhefile" || currArg.substr(0,4) == "-lhe" )
         {
-            //lheFilePath = currArg.substr( currArg.find( "=" ) + 1 ); 
+            lheFilePath = currArg.substr( currArg.find( "=" ) + 1 ); 
         }
         else if( currArg.substr(0,10) == "--rwgtcard" || currArg.substr(0,5) == "-rwgt" )
         {
-            rwgtCardPath = currArg.substr( currArg.find( "=" ) + 1 );
+            //rwgtCardPath = currArg.substr( currArg.find( "=" ) + 1 );
         } else if( currArg.substr(0,8) == "--output" || currArg.substr(0,4) == "-out" ){
             outputPath = currArg.substr( currArg.find( "=" ) + 1 );
         } else
@@ -170,11 +170,6 @@ int main( int argc, char** argv ){
             return usage( argv[0] );
         }
     }
-
-    if( rwgtCardPath.empty() ){
-        return usage( argv[0] );
-    }
-
     std::string currPath = get_current_dir();
 
     size_t slashPos = currPath.find_last_of( "/" ); 
@@ -197,14 +192,15 @@ int main( int argc, char** argv ){
         }
     }
     
-    std::vector<std::string> subDirs = { "1", "4", "8", "10", "40", "80", "100", "400", "800", "1k", "4k", "8k", "10k", "40k", "80k", "100k", "400k", "800k", "1M" };
+    //std::vector<std::string> subDirs = { "1", "4", "8", "10", "40", "80", "100", "400", "800", "1k", "4k", "8k", "10k", "40k", "80k", "100k", "400k", "800k", "1M" };
+    std::vector<std::string> subDirs = {"01par.dat", "02par.dat", "11par.dat", "21par.dat", "31par.dat", "41par.dat", "51par.dat", "61par.dat", "71par.dat", "81par.dat", "91par.dat", "101par.dat"};
 
     std::vector<double> timeVec;
     timeVec.reserve( subDirs.size() );
 
     for( auto dir : subDirs ){
     
-    lheFilePath = "events/" + dir + "/unweighted_events.lhe";
+    rwgtCardPath = "/parCard/" + dir;
         
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
