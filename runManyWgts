@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#dirnames=(1 4 8 10 40 80 100 400 800 1k 4k 8k 10k 40k 80k 100k 400k 800k 1M)
+#dirnames=(1 4 8 10 40 80 100 400 800 1k)
+parnames=("01par.dat" "02par.dat" "11par.dat" "21par.dat" "31par.dat" "41par.dat" "51par.dat" "61par.dat" "71par.dat" "81par.dat" "91par.dat" "101par.dat")
+realtime=()
+usertime=()
+systime=()
+dirname=100k
+
+for parname in "${parnames[@]}"; do
+    output=$( { time -p ./runner.exe -lhe=events/100k/unweighted_events.lhe -rwgt=parCards/$parname -out=overwriting.lhe; } 2>&1 )
+    real=$(echo "$output" | grep real | awk '{print $2}')
+    user=$(echo "$output" | grep user | awk '{print $2}')
+    sys=$(echo "$output" | grep sys | awk '{print $2}')
+
+    real_formatted=$(echo "$real" | awk '{ printf "%.5f", $1 }')
+    user_formatted=$(echo "$user" | awk '{ printf "%.5f", $1 }')
+    sys_formatted=$(echo "$sys" | awk '{ printf "%.5f", $1 }')
+
+    realtime+=("$real_formatted")
+    usertime+=("$user_formatted")
+    systime+=("$sys_formatted")
+done
+
+echo -n "realtime = [ " > times.txt
+printf "%s, " "${realtime[@]}" >> times.txt
+echo "]" >> times.txt
+
+echo -n "usertime = [ " >> times.txt
+printf "%s, " "${usertime[@]}" >> times.txt
+echo "]" >> times.txt
+
+echo -n "systime = [ " >> times.txt
+printf "%s, " "${systime[@]}" >> times.txt
+echo "]" >> times.txt
+

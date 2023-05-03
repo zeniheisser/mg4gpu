@@ -1923,11 +1923,11 @@ namespace PEP
         {
             currNode->addChild(xmlPtrParser( parseFile, initPos, endPos ));
         }
-        //size_t equalSign = parseFile.find("=", initPos);
-        //size_t nodeInitEnd = parseFile.find(">", initPos);
-        //while( equalSign < nodeInitEnd ){
-            //currNode->addTag( xmlTagParser(parseFile, equalSign) );
-        //}
+        size_t equalSign = parseFile.find_first_of("=>", initPos);
+        size_t nodeInitEnd = parseFile.find(">", initPos);
+        while( equalSign < nodeInitEnd ){
+            currNode->addTag( xmlTagParser(parseFile, equalSign) );
+        }
         initPos = *nodeStartFind( parseFile, endPos );
         endPos = *nodeEndFind( parseFile, endPos + 1 );
         return currNode;
