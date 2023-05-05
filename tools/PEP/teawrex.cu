@@ -200,7 +200,7 @@ int main( int argc, char** argv ){
 
     for( auto dir : subDirs ){
     
-    rwgtCardPath = "/parCards/" + dir;
+    rwgtCardPath = "parCards/" + dir;
 
     
     auto t0 = std::chrono::high_resolution_clock::now();
