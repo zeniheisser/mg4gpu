@@ -200,8 +200,11 @@ int main( int argc, char** argv ){
 
     for( auto dir : subDirs ){
     
-    rwgtCardPath = "/parCard/" + dir;
-        
+    rwgtCardPath = "/parCards/" + dir;
+
+    
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     PEP::PER::rwgtFiles fileCol( lheFilePath, slhaPath, rwgtCardPath );
     fileCol.initCards();
 
@@ -217,7 +220,6 @@ int main( int argc, char** argv ){
         return bridgeCont.scatAmp(momenta, alphaS);
     };
 
-    auto t0 = std::chrono::high_resolution_clock::now();
 
     PEP::PER::rwgtRunner nuRun( fileCol, scatteringAmplitude );
     nuRun.runRwgt( outputPath ); 

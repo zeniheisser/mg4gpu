@@ -1,163 +1,230 @@
+
+#*************************************************************************
+#                          Reweight Module                               *
+#                Matrix-Element reweighting at LO/NLO                    *
+#  Mattelaer Olivier                                    arxiv:1607.00763 *  
+#*************************************************************************
+#          
+# Note: 
+#   1) the value of alpha_s will be used from the event so the value in
+#      the param_card is not taken into account.
+#   2) It is (in general) dangerous/wrong to change parameters by a large
+#      amount, if this changes the shape of the matrix elements a lot.
+#      (For example, changing a particle's mass by much more than its
+#      width leads to very inaccurate result). In such a case, separate 
+#      event generation runs are needed.
+#
+#************************************************************************
+# ENTER YOUR COMMANDS BELOW. 
+#************************************************************************
+change helicity False
+
+change mode NLO    # Define type of Reweighting. For LO sample this command
+                   # has no effect since only "LO" mode is allowed.
+
 launch
-   set sminputs 1 1.830701e+03
+   set sminputs 1 1.077266e+03
 launch
-   set sminputs 1 4.066240e+03
+   set sminputs 1 3.255872e+03
 launch
-   set sminputs 1 6.678860e+02
+   set sminputs 1 3.128762e+03
 launch
-   set sminputs 1 6.058543e+03
+   set sminputs 1 8.021774e+03
 launch
-   set sminputs 1 5.588928e+03
+   set sminputs 1 3.524093e+03
 launch
-   set sminputs 1 1.014209e+03
+   set sminputs 1 7.585711e+03
 launch
-   set sminputs 1 5.050533e+03
+   set sminputs 1 1.171230e+03
 launch
-   set sminputs 1 3.048581e+03
+   set sminputs 1 7.912117e+03
 launch
-   set sminputs 1 9.937410e+03
+   set sminputs 1 4.346875e+03
 launch
-   set sminputs 1 7.054350e+03
+   set sminputs 1 9.842902e+03
 launch
-   set sminputs 1 9.204863e+03
+   set sminputs 1 8.382551e+03
 launch
-   set sminputs 1 6.997311e+03
+   set sminputs 1 3.215989e+03
 launch
-   set sminputs 1 1.022754e+03
+   set sminputs 1 3.201544e+03
 launch
-   set sminputs 1 9.347070e+03
+   set sminputs 1 8.937156e+03
 launch
-   set sminputs 1 5.060054e+03
+   set sminputs 1 5.466680e+03
 launch
-   set sminputs 1 2.107911e+03
+   set sminputs 1 9.946469e+03
 launch
-   set sminputs 1 8.503890e+03
+   set sminputs 1 6.938950e+02
 launch
-   set sminputs 1 9.128525e+03
+   set sminputs 1 5.657201e+03
 launch
-   set sminputs 1 1.068522e+03
+   set sminputs 1 4.328173e+03
 launch
-   set sminputs 1 1.450186e+03
+   set sminputs 1 7.267678e+03
 launch
-   set sminputs 1 4.747656e+03
+   set sminputs 1 3.898520e+02
 launch
-   set sminputs 1 1.189817e+03
+   set sminputs 1 7.435204e+03
 launch
-   set sminputs 1 4.750150e+03
+   set sminputs 1 1.321560e+03
 launch
-   set sminputs 1 2.560589e+03
+   set sminputs 1 4.436347e+03
 launch
-   set sminputs 1 2.939687e+03
+   set sminputs 1 1.249019e+03
 launch
-   set sminputs 1 9.026140e+02
+   set sminputs 1 9.236300e+02
 launch
-   set sminputs 1 9.925495e+03
+   set sminputs 1 3.619984e+03
 launch
-   set sminputs 1 2.249899e+03
+   set sminputs 1 2.528138e+03
 launch
-   set sminputs 1 4.969947e+03
+   set sminputs 1 7.646820e+03
 launch
-   set sminputs 1 3.535970e+02
+   set sminputs 1 1.852465e+03
 launch
-   set sminputs 1 3.860382e+03
+   set sminputs 1 7.286464e+03
 launch
-   set sminputs 1 3.272812e+03
+   set sminputs 1 2.359151e+03
 launch
-   set sminputs 1 1.337363e+03
+   set sminputs 1 7.704331e+03
 launch
-   set sminputs 1 7.885401e+03
+   set sminputs 1 4.505016e+03
 launch
-   set sminputs 1 3.939405e+03
+   set sminputs 1 8.046032e+03
 launch
-   set sminputs 1 5.413687e+03
+   set sminputs 1 6.237772e+03
 launch
-   set sminputs 1 4.504687e+03
+   set sminputs 1 2.976436e+03
 launch
-   set sminputs 1 4.837602e+03
+   set sminputs 1 6.348672e+03
 launch
-   set sminputs 1 3.543606e+03
+   set sminputs 1 9.019650e+03
 launch
-   set sminputs 1 2.937490e+02
+   set sminputs 1 2.669136e+03
 launch
-   set sminputs 1 3.364483e+03
+   set sminputs 1 7.766621e+03
 launch
-   set sminputs 1 4.978196e+03
+   set sminputs 1 8.957592e+03
 launch
-   set sminputs 1 9.095641e+03
+   set sminputs 1 4.082737e+03
 launch
-   set sminputs 1 6.941580e+03
+   set sminputs 1 9.098370e+02
 launch
-   set sminputs 1 5.177417e+03
+   set sminputs 1 5.654729e+03
 launch
-   set sminputs 1 6.799294e+03
+   set sminputs 1 1.193762e+03
 launch
-   set sminputs 1 6.107389e+03
+   set sminputs 1 9.132930e+02
 launch
-   set sminputs 1 4.104071e+03
+   set sminputs 1 3.624905e+03
 launch
-   set sminputs 1 8.824444e+03
+   set sminputs 1 7.921969e+03
 launch
-   set sminputs 1 6.202989e+03
+   set sminputs 1 7.002129e+03
 launch
-   set sminputs 1 4.028764e+03
+   set sminputs 1 6.253320e+03
 launch
-   set sminputs 1 1.451615e+03
+   set sminputs 1 7.565910e+02
 launch
-   set sminputs 1 4.570885e+03
+   set sminputs 1 9.615582e+03
 launch
-   set sminputs 1 4.916400e+02
+   set sminputs 1 2.584456e+03
 launch
-   set sminputs 1 6.389113e+03
+   set sminputs 1 6.945986e+03
 launch
-   set sminputs 1 9.487850e+02
+   set sminputs 1 1.607605e+03
 launch
-   set sminputs 1 8.333105e+03
+   set sminputs 1 5.198063e+03
 launch
-   set sminputs 1 2.099279e+03
+   set sminputs 1 8.801916e+03
 launch
-   set sminputs 1 2.211428e+03
+   set sminputs 1 4.753632e+03
 launch
-   set sminputs 1 4.197040e+03
+   set sminputs 1 7.361710e+03
 launch
-   set sminputs 1 2.686740e+03
+   set sminputs 1 8.824408e+03
 launch
-   set sminputs 1 9.129348e+03
+   set sminputs 1 9.701907e+03
 launch
-   set sminputs 1 3.772793e+03
+   set sminputs 1 4.812089e+03
 launch
-   set sminputs 1 2.590233e+03
+   set sminputs 1 1.059677e+03
 launch
-   set sminputs 1 1.574596e+03
+   set sminputs 1 4.159085e+03
 launch
-   set sminputs 1 5.360144e+03
+   set sminputs 1 1.405061e+03
 launch
-   set sminputs 1 3.111602e+03
+   set sminputs 1 4.004764e+03
 launch
-   set sminputs 1 6.839163e+03
+   set sminputs 1 8.698513e+03
 launch
-   set sminputs 1 5.803681e+03
+   set sminputs 1 8.322619e+03
 launch
-   set sminputs 1 2.147331e+03
+   set sminputs 1 8.605282e+03
 launch
-   set sminputs 1 4.468545e+03
+   set sminputs 1 2.888267e+03
 launch
-   set sminputs 1 1.002447e+03
+   set sminputs 1 6.330565e+03
 launch
-   set sminputs 1 8.078801e+03
+   set sminputs 1 3.481438e+03
 launch
-   set sminputs 1 6.581101e+03
+   set sminputs 1 7.048300e+01
 launch
-   set sminputs 1 2.141289e+03
+   set sminputs 1 7.546587e+03
 launch
-   set sminputs 1 4.029131e+03
+   set sminputs 1 1.347432e+03
 launch
-   set sminputs 1 4.479828e+03
+   set sminputs 1 8.691722e+03
 launch
-   set sminputs 1 9.973158e+03
+   set sminputs 1 8.812400e+03
 launch
-   set sminputs 1 2.743603e+03
+   set sminputs 1 7.077855e+03
 launch
-   set sminputs 1 3.552915e+03
+   set sminputs 1 8.940871e+03
 launch
-   set sminputs 1 4.059317e+03
+   set sminputs 1 4.284236e+03
 launch
+
+
+
+#************************************************************************
+# Manual:      https://cp3.irmp.ucl.ac.be/projects/madgraph/wiki/Reweight
+#************************************************************************
+#
+# Example of (standard) code for the computation of two weights:
+#
+# launch                    ! tag to start the computation of the first weight
+#  set BLOCKNAME ID VALUE   ! rule to modify the current param_card
+#  set BLOCKNAME ID VALUE   ! rule to modify the current param_card
+# launch                    ! start to compute a second weight
+#  /home/Cards/param_card_2.dat ! you can also enter a path to a valid card
+#
+# Note: The command to specify the parameter are AFTER the associated "launch" 
+#
+# Possible options: 
+#   You can enter one of the following lines to customize the reweighting 
+#   procedure. These need to be given before the 'launch' command.
+#
+# change model NAME : use another model for the matrix-elements to reweight 
+#        with. In this case you need to provide the path to a correct 
+#        param_card for the new model; you cannot modify the original one 
+#        with the 'set' command.
+# change process DEF [--add]: change the process by which you reweight. 
+#        The initial and final state particles of the new process should 
+#        be exactly identical to the ones in the original process.
+# change helicity False: perform the reweighting by helicity summed 
+#        matrix-elements even if the events have been written with a 
+#        single helicity state.       
+# change mode XXX: change the type of reweighting performed.
+#        allowed values: LO, NLO, LO+NLO
+#        - This command has no effect for reweighting an .lhe event file with LO accuracy. 
+#          In that case LO mode is always used (whatever entry is set).
+#        - When the .lhe file reweighted is at NLO accuracy, then all modes are allowed.
+#          * "LO" is an approximate leading order method
+#          * "NLO" is the NLO accurate method
+#          * "LO+NLO" runs both
+#       - "NLO" and "LO+NLO" modes requires 'store_rwgt_info' equals True (run_card.dat)
+#          If the reweighting is done at generation level this parameter will
+#          automatically be set on True.
+#************************************************************************
