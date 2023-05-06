@@ -256,16 +256,42 @@ namespace PEP::PER
 
     struct rwgtCollection {
     public:
-        void setRwgt( std::shared_ptr<rwgtCard> rwgts ){ rwgtSets = rwgts; }
-        void setRwgt( rwgtCard rwgts ){ setRwgt( std::make_shared<rwgtCard>( rwgts ) ); }
-        void setSlha( std::shared_ptr<PEP::lesHouchesCard> slha ){ slhaParameters = slha; slhaParameters->parse(); }
-        void setSlha( PEP::lesHouchesCard slha ){ setSlha( std::make_shared<PEP::lesHouchesCard>( slha ) ); }
-        void setLhe( std::shared_ptr<PEP::lheNode> lhe ){ lheFile = lhe; }
-        void setLhe( PEP::lheNode lhe ){ setLhe( std::make_shared<PEP::lheNode>( lhe ) ); }
+        void setRwgt( std::shared_ptr<rwgtCard> rwgts ){ 
+            if( rwgtSet ){ return; }
+            rwgtSets = rwgts; 
+            rwgtSet = true;
+        }
+        void setRwgt( rwgtCard rwgts ){ 
+            if( rwgtSet ){ return; }
+            setRwgt( std::make_shared<rwgtCard>( rwgts ) ); rwgtSet = true; 
+        }
+        void setSlha( std::shared_ptr<PEP::lesHouchesCard> slha ){ 
+            if( slhaSet ){ return; }
+            slhaParameters = slha; 
+            slhaParameters->parse(); 
+            slhaSet = true; 
+        }
+        void setSlha( PEP::lesHouchesCard slha ){ 
+            if( slhaSet ){ return; }
+            setSlha( std::make_shared<PEP::lesHouchesCard>( slha ) ); 
+            slhaSet = true;
+        }
+        void setLhe( std::shared_ptr<PEP::lheNode> lhe ){ 
+            if( lheFileSet ){ return; }
+            lheFile = lhe;
+            lheFileSet = true;
+        }
+        void setLhe( PEP::lheNode lhe ){ 
+            if( lheFileSet ){ return; } 
+            setLhe( std::make_shared<PEP::lheNode>( lhe ) ); 
+            lheFileSet = true;
+        }
         void setLhe( std::string_view lhe_file ){
+            if( lheFileSet ){ return; }
             size_t strt = 0;
             size_t post = *PEP::nodeEndFind( lhe_file, strt );
             lheFile = PEP::lheParser( lhe_file, strt, post );
+            lheFileSet = true;
         }
         std::shared_ptr<rwgtCard> getRwgt(){ return rwgtSets; }
         std::shared_ptr<PEP::lesHouchesCard> getSlha(){ return slhaParameters; }
@@ -292,6 +318,9 @@ namespace PEP::PER
         std::shared_ptr<std::vector<double>> wgts;
         std::shared_ptr<std::vector<double>> gS;
         std::shared_ptr<std::vector<double>> momenta;
+        bool lheFileSet = false;
+        bool slhaSet = false;
+        bool rwgtSet = false;
     };
 
     struct rwgtFiles : rwgtCollection {
@@ -416,7 +445,6 @@ namespace PEP::PER
         }
     public:
         void runRwgt( const std::string& output ){
-            srand((unsigned) time(NULL));
             setMEs();
             setNormWgts();
             rwgtGroup = std::make_shared<PEP::weightGroup>();
