@@ -41,6 +41,134 @@ namespace REX::teaw
     std::shared_ptr<std::vector<T1>> scatAmpEval(std::vector<T2>& momenta, std::function<std::vector<T1>(std::vector<T2>&, std::vector<T2>&)> evalFunc)
     { return evalFunc(momenta); }
 
+    unsigned int lheWriter( std::shared_ptr<REX::lheNode> lheFile, std::string outputDir = "rwgt_evts.lhe" ){
+        bool writeSuccess = REX::filePusher( outputDir, *lheFile->nodeWriter() );
+        return int(writeSuccess);
+    }
+
+    // ZW: teawREX is written under the assumption that functors are
+    // written as subroutines whose return values indicate error values.
+    // A non-zero return value is assumed to indicate an error condition,
+    // and an exception is thrown.
+    // ptrToRetWrap is a small wrapper which turns a function which takes
+    // an output pointer as an argument into a function which returns a value,
+    // for users more familiar with return values than classic subroutines.
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<unsigned int(retType*, Args...)> ptrFcn, Args... args ){
+        retType* retVal;
+        auto errVal = ptrFcn(retVal, args);
+        if( errVal!= 0 )
+            throw std::runtime_error("Function wrapped with ptrToRetWrap returned non-zero value, undefined behaviour.");
+        return *retVal;
+    }
+
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<unsigned int(retType&, Args...)> ptrFcn, Args... args ){
+        retType retVal;
+        auto errVal = ptrFcn(retVal, args);
+        if( errVal!= 0 )
+            throw std::runtime_error("Function wrapped with ptrToRetWrap returned non-zero value, undefined behaviour.");
+        return retVal;
+    }
+
+    // ZW: Overload of ptrToRetWrap where functor returns a bool
+    // rather than unsigned int.
+    // NOTE: To maintain the same behaviour as the original version,
+    // an exception is thrown if the return value is true.
+    // You may need to include a boolean inversion in your functor,
+    // if you assume "true" to mean success.
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<bool(retType*, Args...)> ptrFcn, Args... args ){
+        retType* retVal;
+        auto errVal = ptrFcn(retVal, args);
+        if( errVal )
+            throw std::runtime_error("Function wrapped with ptrToRetWrap returned non-zero value, undefined behaviour.");
+        return *retVal;
+    }
+
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<bool(retType&, Args...)> ptrFcn, Args... args ){
+        retType retVal;
+        auto errVal = ptrFcn(retVal, args);
+        if( errVal )
+            throw std::runtime_error("Function wrapped with ptrToRetWrap returned non-zero value, undefined behaviour.");
+        return retVal;
+    }
+
+    // ZW: Overload of ptrToRetWrap where functor has no return value.
+    // NOTE: As the passed functor returns void, the wrapper
+    // cannot check for error values. Avoid using this unless the functor
+    // has well-established error handling.
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<void(retType*, Args...)> ptrFcn, Args... args ){
+        retType* retVal;
+        ptrFcn(retVal, args);
+        return *retVal;
+    }
+
+    template<typename retType, typename... Args>
+    retType& ptrToRetWrap( std::function<void(retType&, Args...)> ptrFcn, Args... args ){
+        retType retVal;
+        ptrFcn(retVal, args);
+        return retVal;
+    }
+
+    template<typename... Args>
+    struct rwgtIterator{
+        using fcnType = std::function<unsigned int(Args...)>;
+        rwgtIterator(){}
+        rwgtIterator( fcnType& ampEval, fcnType& iterEval, fcnType& writOutput ){
+            amplitude = ampEval; ampSet = true;
+            iterator = iterEval; iterSet = true;
+            writer = writOutput; writSet = true;
+        }
+        rwgtIterator( fcnType* ampEval, fcnType* iterEval, fcnType* writOutput ){
+            amplitude = *ampEval; ampSet = true;
+            iterator = *iterEval; iterSet = true;
+            writer = *writOutput; writSet = true;
+        }
+        bool setAmp( fcnType& ampEval ){
+            amplitude = ampEval; ampSet = true;
+            return ampSet;
+        }
+        bool setAmp( fcnType* ampEval ){
+            return setAmp(*ampEval);
+        }
+        bool setIter( fcnType& iterEval ){
+            iterator = iterEval; iterSet = true;
+            return iterSet;
+        }
+        bool setIter( fcnType* iterEval ){
+            return setIter(*iterEval);
+        }
+        bool setWrit( fcnType& writOutput ){
+            writer = writOutput; writSet = true;
+            return writSet;
+        }
+        bool setWrit( fcnType* writOutput ){
+            return setWrit(*writOutput);
+        }
+        bool ampIsSet(){ return ampSet; }
+        bool iterIsSet(){ return iterSet; }
+        bool writIsSet(){ return writSet; }
+        unsigned int ampEval( Args... args ){
+            return amplitude(args);
+        }
+        unsigned int iterEval( Args... args ){
+            return iterator(args);
+        }
+        unsigned int writOutput( Args... args ){
+            return writer(args);
+        }
+    protected:
+        fcnType amplitude;
+        fcnType iterator;
+        fcnType writer;
+        bool ampSet = false;
+        bool iterSet = false;
+        bool writSet = false;
+    };
+
     struct rwgtVal : REX::paramVal{
     public:
         std::string_view blockName;
