@@ -824,7 +824,7 @@ namespace mg5amcCpu
     int goodHel[ncomb] = { 0 }; // all zeros https://en.cppreference.com/w/c/language/array_initialization#Notes
     for( int ihel = 0; ihel < ncomb; ihel++ )
     {
-      //std::cout << "sigmaKin_setGoodHel ihel=" << ihel << ( isGoodHel[ihel] ? " true" : " false" ) << std::endl;
+      std::cout << "sigmaKin_setGoodHel ihel=" << ihel << ( isGoodHel[ihel] ? " true" : " false" ) << std::endl;
       if( isGoodHel[ihel] )
       {
         goodHel[nGoodHel] = ihel;
