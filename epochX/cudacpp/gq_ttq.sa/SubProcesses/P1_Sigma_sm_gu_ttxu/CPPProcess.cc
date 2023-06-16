@@ -721,13 +721,12 @@ namespace mg5amcCpu
 #endif
       if( allMEs[ievt] != allMEsLast )
       {
-        //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+        if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
         isGoodHel[ihel] = true;
         ++ngood;
       }
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
-    printf("%z\n",ngood);
   }
 #else
   void
