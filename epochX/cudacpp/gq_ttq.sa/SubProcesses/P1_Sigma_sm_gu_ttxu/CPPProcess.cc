@@ -708,6 +708,7 @@ namespace mg5amcCpu
     fptype allMEsLast = 0;
     const int ievt = blockDim.x * blockIdx.x + threadIdx.x; // index of event (thread) in grid
     allMEs[ievt] = 0;
+    size_t ngood = 0;
     for( int ihel = 0; ihel < ncomb; ihel++ )
     {
       // NB: calculate_wavefunctions ADDS |M|^2 for a given ihel to the running sum of |M|^2 over helicities for the given event(s)
@@ -724,9 +725,9 @@ namespace mg5amcCpu
         isGoodHel[ihel] = true;
         ++ngood;
       }
-      printf("ngood: %zu\n", ngood);
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
+    printf("ngood: %zu\n", ngood);
   }
 #else
   void
