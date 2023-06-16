@@ -721,7 +721,8 @@ namespace mg5amcCpu
 #endif
       if( allMEs[ievt] != allMEsLast )
       {
-        if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+        //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+        printf( "sigmaKin_getGoodHel ihel=%d TRUE\n", ihel ); 
         isGoodHel[ihel] = true;
         ++ngood;
       }
