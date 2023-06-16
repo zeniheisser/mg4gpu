@@ -725,9 +725,9 @@ namespace mg5amcCpu
         isGoodHel[ihel] = true;
         ++ngood;
       }
-      std::cout << "ngood=" << ngood << std::endl;
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
+    std::cout << "ngood=" << ngood << std::endl;
   }
 #else
   void
