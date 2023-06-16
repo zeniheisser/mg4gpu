@@ -711,11 +711,14 @@ namespace mg5amcCpu
 #else
       calculate_wavefunctions( ihel, allmomenta, allcouplings, allMEs, jamp2_sv );
 #endif
+      std::size_t ngood = 0;
       if( allMEs[ievt] != allMEsLast )
       {
         //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
         isGoodHel[ihel] = true;
+        ++ngood;
       }
+      std::cout << "ngood=" << ngood << std::endl;
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
   }
@@ -774,6 +777,7 @@ namespace mg5amcCpu
 #else
         calculate_wavefunctions( ihel, allmomenta, allcouplings, allMEs, jamp2_sv, ievt00 );
 #endif
+        std::size_t ngood = 0;
         for( int ieppV = 0; ieppV < neppV; ++ieppV )
         {
           const int ievt = ievt00 + ieppV;
@@ -781,8 +785,10 @@ namespace mg5amcCpu
           if( differs )
           {
             //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+            ++ngood;
             isGoodHel[ihel] = true;
           }
+          std::cout << "ngood=" << ngood << std::endl;
           allMEsLast[ievt] = allMEs[ievt]; // running sum up to helicity ihel
 #if defined MGONGPU_CPPSIMD and defined MGONGPU_FPTYPE_DOUBLE and defined MGONGPU_FPTYPE2_FLOAT
           const int ievt2 = ievt00 + ieppV + neppV;
@@ -790,8 +796,11 @@ namespace mg5amcCpu
           if( differs2 )
           {
             //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+            ++ngood;
             isGoodHel[ihel] = true;
           }
+          std::cout << "ngood=" << ngood << std::endl;
+          allMEsLast[ievt2] = allMEs[ievt2]; // running sum up to helicity ihel
           allMEsLast[ievt2] = allMEs[ievt2]; // running sum up to helicity ihel
 #endif
         }

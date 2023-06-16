@@ -718,11 +718,14 @@ namespace mg5amcCpu
 #else
       calculate_wavefunctions( ihel, allmomenta, allcouplings, allMEs, jamp2_sv );
 #endif
+      std::size_t ngood = 0;
       if( allMEs[ievt] != allMEsLast )
       {
         //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
         isGoodHel[ihel] = true;
+        ++ngood;
       }
+      std::cout << "ngood=" << ngood << std::endl;
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
   }
@@ -743,6 +746,7 @@ namespace mg5amcCpu
     // Allocate arrays at build time to contain at least 16 events (or at least neppV events if neppV>16, e.g. in future VPUs)
     constexpr int maxtry0 = std::max( 16, neppV ); // 16, but at least neppV (otherwise the npagV loop does not even start)
     fptype allMEsLast[maxtry0] = { 0 };            // allocated at build time: maxtry0 must be a constexpr
+    std::size_t ngood = 0;
     // Loop over only nevt events if nevt is < 16 (note that nevt is always >= neppV)
     assert( nevt >= neppV );
     const int maxtry = std::min( maxtry0, nevt ); // 16, but at most nevt (avoid invalid memory access if nevt<maxtry0)
@@ -788,8 +792,10 @@ namespace mg5amcCpu
           if( differs )
           {
             //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+            ++ngood;
             isGoodHel[ihel] = true;
           }
+          std::cout << "ngood=" << ngood << std::endl;
           allMEsLast[ievt] = allMEs[ievt]; // running sum up to helicity ihel
 #if defined MGONGPU_CPPSIMD and defined MGONGPU_FPTYPE_DOUBLE and defined MGONGPU_FPTYPE2_FLOAT
           const int ievt2 = ievt00 + ieppV + neppV;
@@ -797,8 +803,10 @@ namespace mg5amcCpu
           if( differs2 )
           {
             //if ( !isGoodHel[ihel] ) std::cout << "sigmaKin_getGoodHel ihel=" << ihel << " TRUE" << std::endl;
+            ++ngood;
             isGoodHel[ihel] = true;
           }
+          std::cout << "ngood=" << ngood << std::endl;
           allMEsLast[ievt2] = allMEs[ievt2]; // running sum up to helicity ihel
 #endif
         }
