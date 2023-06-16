@@ -727,7 +727,7 @@ namespace mg5amcCpu
       }
       allMEsLast = allMEs[ievt]; // running sum up to helicity ihel for event ievt
     }
-    printf(ngood);
+    printf("%z\n",ngood);
   }
 #else
   void
